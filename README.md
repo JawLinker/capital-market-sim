@@ -1,15 +1,12 @@
 # Capital Market Simulator
 
-[![CI](https://img.shields.io/github/actions/workflow/status/OWNER/REPO/ci.yml?branch=main&label=CI&logo=github)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/JawLinker/capital-market-sim/ci.yml?branch=main&label=CI&logo=github)](https://github.com/JawLinker/capital-market-sim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A production-style stock market simulation game. Start with ¥100,000 in virtual
 cash, trade 50 real A-share companies across five industries, and try to beat
 the Shanghai Composite through bull, bear, recovery, and recession cycles.
 Every price move is real history, replayed day by day.
-
-> Replace `OWNER/REPO` in the CI badge with your GitHub repository path after
-> creating the repo.
 
 ![Dashboard](screenshots/01-dashboard.png)
 
