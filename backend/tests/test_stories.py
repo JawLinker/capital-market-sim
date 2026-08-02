@@ -5,8 +5,12 @@ def test_today_story_is_deterministic(client):
     assert first.json() == second.json()
     body = first.json()
     assert body["id"].startswith("s")
+    assert body["file_no"]
     assert body["tag"]
     assert body["era"]
+    assert body["date"]
+    assert body["source"]
+    assert body["stamp"]
     assert body["title"]
     assert body["prologue"]
     assert body["story"]
@@ -16,6 +20,15 @@ def test_random_story_is_valid(client):
     response = client.get("/api/stories/random")
     assert response.status_code == 200
     assert response.json()["id"].startswith("s")
+
+
+def test_list_stories_returns_all_archives(client):
+    response = client.get("/api/stories")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["count"] >= 20
+    assert len(body["stories"]) == body["count"]
+    assert all(item["file_no"] for item in body["stories"])
 
 
 def test_story_follows_game_day(client):

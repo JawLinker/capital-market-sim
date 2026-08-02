@@ -26,7 +26,8 @@ Every price move is real history, replayed day by day.
   their returns span large losses to large gains
 - **Retail investor stories**: an era-flavored fictional tale pops up after
   each trading day, written like a market archive from 1993 to 2024, with 20+
-  bilingual stories and a "tell me another" mode
+  bilingual dossiers, a browsable "Retail Era Archive" page, and a "tell me
+  another" mode
 - **Full product surface**: dashboard, market terminal, portfolio analytics,
   rule-based AI advisor, achievements, manager archives, leaderboard, and
   English/Chinese UI

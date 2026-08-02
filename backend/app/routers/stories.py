@@ -11,6 +11,15 @@ from ..services.stories import STORIES, localize_story
 router = APIRouter(prefix="/api", tags=["stories"])
 
 
+@router.get("/stories")
+def list_stories(request: Request):
+    lang = get_lang(request)
+    return {
+        "count": len(STORIES),
+        "stories": [localize_story(story, lang) for story in STORIES],
+    }
+
+
 @router.get("/stories/today")
 def get_today_story(request: Request, db: Session = Depends(get_db)):
     state = db.query(models.GameState).first()

@@ -113,7 +113,7 @@ async function canvasCheck(page, label) {
   await page.waitForTimeout(1200);
   await shot(page, "04-after-advance.png");
 
-  await page.waitForSelector("text=Today's Retail Story", { timeout: 15000 });
+  await page.waitForSelector("text=Retail Era Archive", { timeout: 15000 });
   await shot(page, "15-retail-story.png");
   await page.getByRole("button", { name: "Got it" }).click();
 
@@ -134,6 +134,13 @@ async function canvasCheck(page, label) {
   await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
   await page.waitForTimeout(800);
   await shot(page, "07-achievements.png");
+
+  await page.getByTitle("Archive").click();
+  await page.waitForSelector("text=Retail Era Archive", { timeout: 15000 });
+  await page.waitForTimeout(800);
+  await shot(page, "16-archive.png");
+  await page.getByTitle("Achievements").click();
+  await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
   watch(mobile);

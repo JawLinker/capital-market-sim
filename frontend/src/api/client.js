@@ -59,6 +59,7 @@ export const api = {
   getNews: (limit = 20) => request(`/api/news?limit=${limit}`),
   getTodayStory: () => request("/api/stories/today"),
   getRandomStory: () => request("/api/stories/random"),
+  getStories: () => request("/api/stories"),
   getPortfolio: () => request("/api/portfolio"),
   getAdvisorReport: () => request("/api/advisor/portfolio"),
   advisorChat: (message) =>

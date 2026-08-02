@@ -1,4 +1,5 @@
 import {
+  Archive,
   Badge,
   Briefcase,
   CandlestickChart,
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { key: "portfolio", label: "Portfolio", icon: Briefcase },
   { key: "advisor", label: "Advisor", icon: Sparkles },
   { key: "achievements", label: "Achievements", icon: Trophy },
+  { key: "archive", label: "Archive", icon: Archive },
 ];
 
 function Sidebar() {
