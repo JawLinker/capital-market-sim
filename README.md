@@ -32,6 +32,9 @@ Every price move is real history, replayed day by day.
   each trading day, written like a market archive from 1993 to 2024, with 20+
   bilingual dossiers, a browsable "Retail Era Archive" page, and a "tell me
   another" mode
+- **Legend dossiers & timeline**: anonymized legends inspired by real market
+  folklore (limit-up commandos, lights-off noodles, sack-of-cash lithium)
+  plus a factual historical timeline from 1988 to 2019
 - **Full product surface**: dashboard, market terminal, portfolio analytics,
   rule-based AI advisor, achievements, manager archives, leaderboard, and
   English/Chinese UI

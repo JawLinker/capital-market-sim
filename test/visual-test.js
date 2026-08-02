@@ -139,6 +139,14 @@ async function canvasCheck(page, label) {
   await page.waitForSelector("text=Retail Era Archive", { timeout: 15000 });
   await page.waitForTimeout(800);
   await shot(page, "16-archive.png");
+  await page.getByRole("button", { name: "Legend Dossiers" }).click();
+  await page.waitForSelector("text=LG-2000-001", { timeout: 15000 });
+  await page.waitForTimeout(600);
+  await shot(page, "17-legends.png");
+  await page.getByRole("button", { name: "Historical Timeline" }).click();
+  await page.waitForSelector("text=1988", { timeout: 15000 });
+  await page.waitForTimeout(600);
+  await shot(page, "18-timeline.png");
   await page.getByTitle("Milestones").click();
   await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
 
