@@ -34,6 +34,7 @@ export default function DashboardView() {
     indexHistory,
     selectTicker,
     playerActivity,
+    chronicle,
     t,
     lang,
   } = useApp();
@@ -64,6 +65,75 @@ export default function DashboardView() {
       />
 
       <TimelineNavigator eras={eras} current={era.key} />
+
+      <ArchiveCard
+        stamp={chronicle?.stamp}
+        header={
+          <div className="flex w-full flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="flex items-center gap-2 font-display text-[15px] font-semibold text-parch-100">
+                <ScrollText size={15} className="text-brass" />
+                {t("chronicle.title")}
+              </h2>
+              <p className="mt-0.5 text-xs text-parch-500">{chronicle?.summary || ""}</p>
+            </div>
+            <Badge className="border-brass/40 bg-brass/10 text-brass">{chronicle?.title}</Badge>
+          </div>
+        }
+      >
+        <ol className="flex flex-wrap items-center gap-1.5">
+          {(chronicle?.beats || []).map((beat) => (
+            <li
+              key={beat.id}
+              className={`rounded-[3px] border px-2 py-1 text-[11px] font-semibold ${
+                beat.status === "current"
+                  ? "border-risk/50 bg-risk/10 text-risk"
+                  : beat.status === "passed"
+                    ? "border-brass/35 bg-brass/5 text-brass"
+                    : "border-ink-600/80 text-parch-600"
+              }`}
+              title={beat.title}
+            >
+              {beat.index}. {beat.title}
+            </li>
+          ))}
+        </ol>
+        {(() => {
+          const current = (chronicle?.beats || []).find((beat) => beat.status === "current");
+          const objective = current?.objective;
+          if (!objective) return null;
+          return (
+            <div className="mt-3 rounded-[3px] border border-ink-600/70 bg-ink-900/60 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-parch-600">
+                  {t("chronicle.objective")}
+                </p>
+                <span
+                  className={`rounded-[3px] border px-2 py-0.5 text-[10px] font-bold ${
+                    objective.met
+                      ? "border-mint/40 bg-mint/10 text-mint"
+                      : "border-brass/40 bg-brass/10 text-brass"
+                  }`}
+                >
+                  {objective.met ? t("chronicle.met") : t("chronicle.notMet")}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-parch-300">{objective.label}</p>
+              <p className="mt-1 text-xs tabular text-parch-500">
+                {objective.current.toLocaleString()} / {objective.target.toLocaleString()}
+              </p>
+              {objective.target > 0 ? (
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-600">
+                  <div
+                    className="h-full rounded-full bg-brass"
+                    style={{ width: `${Math.min(100, (objective.current / objective.target) * 100)}%` }}
+                  />
+                </div>
+              ) : null}
+            </div>
+          );
+        })()}
+      </ArchiveCard>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <ArchiveCard

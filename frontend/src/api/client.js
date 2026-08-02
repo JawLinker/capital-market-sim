@@ -62,6 +62,7 @@ export const api = {
   getStories: () => request("/api/stories"),
   getLegends: () => request("/api/legends"),
   getTimeline: () => request("/api/timeline"),
+  getChronicle: () => request("/api/chronicle"),
   getPortfolio: () => request("/api/portfolio"),
   getAdvisorReport: () => request("/api/advisor/portfolio"),
   advisorChat: (message) =>

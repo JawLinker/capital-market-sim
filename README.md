@@ -20,6 +20,9 @@ Every price move is real history, replayed day by day.
 - **Museum experience**: archival dark-room design with a playable era
   timeline, historical event clippings, an investor journal, and a dossier
   story archive
+- **Era chronicles**: the replay is scripted into six story arcs from 2021 to
+  2026, with chapter events and portfolio objectives, including the 2026
+  tech-wave arc
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

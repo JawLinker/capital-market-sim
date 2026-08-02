@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useApp } from "../../store/AppContext.jsx";
 import { eraForDate } from "../../utils/era.js";
 import { CYCLE_META, money, percent, toneClass } from "../../utils/format.js";
+import ChronicleModal from "../story/ChronicleModal.jsx";
 import RetailStoryModal from "../story/RetailStoryModal.jsx";
 
 const NAV_ITEMS = [
@@ -244,7 +245,7 @@ function TopBar() {
 }
 
 export default function AppShell({ children }) {
-  const { loading, t, storyOpen } = useApp();
+  const { loading, t, storyOpen, chronicleOpen } = useApp();
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -263,6 +264,7 @@ export default function AppShell({ children }) {
         <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
       </div>
       {storyOpen ? <RetailStoryModal /> : null}
+      {chronicleOpen ? <ChronicleModal /> : null}
     </div>
   );
 }

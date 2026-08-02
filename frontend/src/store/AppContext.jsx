@@ -62,9 +62,12 @@ export function AppProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const [story, setStory] = useState(null);
   const [storyOpen, setStoryOpen] = useState(false);
+  const [chronicle, setChronicle] = useState(null);
+  const [chronicleOpen, setChronicleOpen] = useState(false);
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
+  const chronicleBeatRef = useRef(null);
 
   useEffect(() => {
     setApiLanguage(lang);
@@ -185,7 +188,7 @@ export function AppProvider({ children }) {
 
   const refreshAll = useCallback(async () => {
     try {
-      const [state, portfolioData, leaderboardData, achievementsData, advisorData, transactionData, activityData] =
+      const [state, portfolioData, leaderboardData, achievementsData, advisorData, transactionData, activityData, chronicleData] =
         await Promise.all([
           api.getState(),
           api.getPortfolio(),
@@ -194,6 +197,7 @@ export function AppProvider({ children }) {
           api.getAdvisorReport(),
           api.getTransactions(500),
           api.getPlayerActivity(30),
+          api.getChronicle(),
         ]);
       setGameState(state);
       setPortfolio(portfolioData);
@@ -202,10 +206,19 @@ export function AppProvider({ children }) {
       setAdvisor(advisorData);
       setTransactions(transactionData.transactions);
       setPlayerActivity(activityData.trades);
+      setChronicle(chronicleData);
+      const prevBeat = chronicleBeatRef.current;
+      const nextBeat = chronicleData?.current_beat || null;
+      if (prevBeat && nextBeat && prevBeat !== nextBeat) {
+        setChronicleOpen(true);
+      }
+      chronicleBeatRef.current = nextBeat;
     } catch (error) {
       addToast("error", t("toast.failedLoad"), error.message);
     }
   }, [addToast, t]);
+
+  const closeChronicle = useCallback(() => setChronicleOpen(false), []);
 
   const login = useCallback(
     async (username, password) => {
@@ -385,6 +398,9 @@ export function AppProvider({ children }) {
       lang,
       story,
       storyOpen,
+      chronicle,
+      chronicleOpen,
+      closeChronicle,
       openStory,
       nextStory,
       closeStory,
@@ -423,6 +439,9 @@ export function AppProvider({ children }) {
       lang,
       story,
       storyOpen,
+      chronicle,
+      chronicleOpen,
+      closeChronicle,
       openStory,
       nextStory,
       closeStory,

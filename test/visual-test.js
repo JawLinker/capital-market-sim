@@ -66,6 +66,7 @@ async function loginHost(page) {
 async function waitForDashboard(page) {
   await page.waitForSelector("text=Portfolio value", { timeout: 20000 });
   await page.waitForSelector("text=Market movers", { timeout: 15000 });
+  await page.waitForSelector("text=Era Chronicle", { timeout: 15000 });
   await page.waitForTimeout(800);
 }
 
