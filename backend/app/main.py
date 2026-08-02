@@ -50,10 +50,10 @@ app.include_router(advisor.router)
 app.include_router(gamification.router)
 app.include_router(stories.router)
 
-if FRONTEND_DIST is not None:
-    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
-
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+if FRONTEND_DIST is not None:
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")

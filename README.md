@@ -55,6 +55,14 @@ Every price move is real history, replayed day by day.
 
 Requirements: Python 3.12+ and Node.js 18+.
 
+### One-click start (recommended)
+
+On Windows, double-click `start.bat` (or run `.\start.ps1`). The script creates
+the backend environment, builds the frontend when needed, starts the game, and
+opens the browser at http://127.0.0.1:8000. Close the window to stop.
+
+### Manual start
+
 Backend (terminal 1):
 
 ```bash
