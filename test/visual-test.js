@@ -51,7 +51,10 @@ async function loginHost(page) {
   const reset = await page.request.post(`${BASE}/api/game/reset`);
   if (!reset.ok()) throw new Error(`game reset failed: ${reset.status()}`);
   await page.goto(BASE, { waitUntil: "domcontentloaded" });
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem("cms-lang", "en");
+  });
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.waitForSelector("text=Login", { timeout: 20000 });
   await page.locator(".panel input").first().fill("host");
@@ -136,6 +139,9 @@ async function canvasCheck(page, label) {
   watch(mobile);
   await mobile.goto(BASE, { waitUntil: "domcontentloaded" });
   await mobile.evaluate(() => localStorage.clear());
+  await mobile.reload({ waitUntil: "domcontentloaded" });
+  await mobile.waitForSelector("text=登录", { timeout: 20000 });
+  await mobile.evaluate(() => localStorage.setItem("cms-lang", "en"));
   await mobile.reload({ waitUntil: "domcontentloaded" });
   await mobile.waitForSelector("text=Login", { timeout: 20000 });
   await mobile.locator(".panel input").first().fill("host");

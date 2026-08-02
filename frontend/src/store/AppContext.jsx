@@ -39,7 +39,7 @@ function Toast({ id, kind, title, detail, onClose }) {
 }
 
 export function AppProvider({ children }) {
-  const [lang, setLang] = useState(() => localStorage.getItem("cms-lang") || "en");
+  const [lang, setLang] = useState(() => localStorage.getItem("cms-lang") || "zh");
   const [authPlayer, setAuthPlayer] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [view, setView] = useState("dashboard");
@@ -65,6 +65,10 @@ export function AppProvider({ children }) {
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
+
+  useEffect(() => {
+    setApiLanguage(lang);
+  }, [lang]);
 
   useEffect(() => {
     achievementsRef.current = achievements;

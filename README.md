@@ -84,7 +84,7 @@ npm run dev
 Open http://127.0.0.1:5173 and log in with the seeded account `host / 123456`.
 The SQLite database is created and seeded automatically at
 `backend/data/market.db` on first startup. Use the globe button in the top bar
-to switch between English and Chinese.
+to switch between English and Chinese. The UI defaults to Chinese.
 
 ## Run the Tests
 

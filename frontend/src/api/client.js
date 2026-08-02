@@ -1,5 +1,5 @@
 const BASE = import.meta.env.VITE_API_BASE || "";
-let language = "en";
+let language = localStorage.getItem("cms-lang") || "zh";
 const REQUEST_TIMEOUT_MS = 20000;
 
 function authHeaders() {
