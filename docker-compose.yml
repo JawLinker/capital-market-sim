@@ -1,0 +1,13 @@
+services:
+  capital-market-sim:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - CMS_HOST_PASSWORD=${CMS_HOST_PASSWORD:-host123456}
+    volumes:
+      - cms-data:/app/backend/data
+    restart: unless-stopped
+
+volumes:
+  cms-data:

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: capital-market-sim
+    runtime: docker
+    repo: https://github.com/JawLinker/capital-market-sim
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: CMS_HOST_PASSWORD
+        generateValue: true

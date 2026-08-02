@@ -129,6 +129,31 @@ Each player keeps their own save at `data/market.db` next to the executable.
 3. The first registered player is the host and can advance time, fast-forward,
    or reset the market. The seeded host account is `host / 123456`.
 
+## Deploy Online
+
+The backend serves the built React app on one port, so the whole game runs as a
+single container.
+
+Docker locally:
+
+```bash
+docker compose up --build
+```
+
+Open http://127.0.0.1:8000. The compose demo host password defaults to
+`host123456`; set `CMS_HOST_PASSWORD` to change it.
+
+One-click cloud options (the `Dockerfile` is already in the repo):
+
+- Zeabur: connect the GitHub repo and let it auto-detect the Dockerfile
+- Render: create a Blueprint from `render.yaml`, or add a Web Service with the
+  Docker runtime
+- Any VM with Docker: clone the repo and run `docker compose up -d --build`
+
+Before going public, set `CMS_HOST_PASSWORD` to a random value so strangers
+cannot log in as the host and reset the demo. Game data persists in the Docker
+volume mounted at `/app/backend/data`.
+
 ## Real A-Share Data
 
 `backend/scripts/fetch_a_share_snapshot.py` downloads daily history for 50
@@ -167,6 +192,13 @@ capital-market-sim/
 - [Architecture](docs/ARCHITECTURE.md) - system design, database schema,
   market engine, API contract, and UI spec
 - Interactive API docs at http://127.0.0.1:8000/docs while the server runs
+
+## Roadmap
+
+- Frontend unit tests (Vitest + Testing Library) and ESLint
+- Route-level code splitting to shrink the initial bundle
+- Online leaderboard with optional cloud save
+- Weekly challenge: every player gets the same market seed for one week
 
 ## License
 

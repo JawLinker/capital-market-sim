@@ -1,4 +1,5 @@
 import json
+import os
 import random
 from datetime import date, timedelta
 
@@ -168,7 +169,7 @@ def seed_database(db: Session) -> bool:
     player = models.Player(
         name="Host",
         username="host",
-        password_hash=hash_password("123456"),
+        password_hash=hash_password(os.environ.get("CMS_HOST_PASSWORD", "123456")),
         api_key=generate_api_key(),
         is_host=1,
         starting_cash=STARTING_CASH,
