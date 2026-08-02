@@ -6,7 +6,7 @@ from ..database import get_db
 from ..i18n import get_lang
 from ..services import portfolio
 from ..services.auth import get_current_player
-from ..services.chronicle import build_chronicle
+from ..services.chronicle import arc_book, build_chronicle
 
 router = APIRouter(prefix="/api", tags=["chronicle"])
 
@@ -17,3 +17,11 @@ def get_chronicle(request: Request, db: Session = Depends(get_db)):
     state = db.query(models.GameState).first()
     date = state.date if state else "2019-03-04"
     return build_chronicle(db, player, date, get_lang(request))
+
+
+@router.get("/chronicle/book")
+def get_chronicle_book(request: Request, db: Session = Depends(get_db)):
+    player = get_current_player(db, request) or portfolio.get_or_create_player(db)
+    state = db.query(models.GameState).first()
+    date = state.date if state else "2019-03-04"
+    return arc_book(db, player, date, get_lang(request))

@@ -35,6 +35,10 @@ ACHIEVEMENTS = [
     ("milestone_200k", "Six-Figure Club", "Reach a portfolio value of ¥200,000.", "milestone"),
     ("day_30", "One Month In", "Complete 30 trading days.", "milestone"),
     ("day_100", "Seasoned Investor", "Complete 100 trading days.", "milestone"),
+    ("chronicle_tech", "Tech Trailblazer", "Complete a chapter objective tied to tech exposure.", "strategy"),
+    ("chronicle_profit", "Profit Taker", "Complete a chapter objective tied to tech profit.", "trading"),
+    ("chronicle_cash", "Cash Warden", "Complete a chapter objective tied to holding cash.", "strategy"),
+    ("chronicle_survivor", "Cycle Survivor", "Complete a chapter objective tied to total return.", "risk"),
 ]
 
 RIVALS = [
@@ -54,6 +58,10 @@ RIVALS = [
     ("Follower Retail Fund", "retail_follower", 0.05, 0.92, {"technology": 0.3, "healthcare": 0.2, "energy": 0.2, "finance": 0.15, "consumer": 0.15}),
     ("Margin Retail Fund", "retail_margin", 0.05, 1.1, {"technology": 0.3, "healthcare": 0.2, "energy": 0.2, "finance": 0.15, "consumer": 0.15}),
     ("Sleeper Retail Fund", "retail_sleeper", 0.08, 0.95, {"technology": 0.15, "healthcare": 0.25, "energy": 0.2, "finance": 0.25, "consumer": 0.15}),
+    ("Commando of the Ningbo Floor", "retail_limit", 0.06, 1.06, {"technology": 0.5, "healthcare": 0.1, "energy": 0.15, "finance": 0.1, "consumer": 0.15}),
+    ("The Noodle Man", "retail_knife", 0.09, 0.9, {"technology": 0.2, "healthcare": 0.2, "energy": 0.2, "finance": 0.2, "consumer": 0.2}),
+    ("The Sack Miner", "retail_chase", 0.05, 1.08, {"technology": 0.5, "healthcare": 0.1, "energy": 0.2, "finance": 0.1, "consumer": 0.1}),
+    ("The White Glove", "retail_allin", 0.04, 1.0, {"technology": 0.3, "healthcare": 0.15, "energy": 0.2, "finance": 0.2, "consumer": 0.15}),
 ]
 
 _RETAIL_STYLES = [

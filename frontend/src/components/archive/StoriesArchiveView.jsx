@@ -20,15 +20,17 @@ export default function StoriesArchiveView() {
   const [stories, setStories] = useState([]);
   const [legends, setLegends] = useState([]);
   const [timeline, setTimeline] = useState([]);
+  const [book, setBook] = useState({ arcs: [] });
   const [eraFilter, setEraFilter] = useState("all");
   const [openId, setOpenId] = useState(null);
 
   useEffect(() => {
-    Promise.all([api.getStories(), api.getLegends(), api.getTimeline()])
-      .then(([storyData, legendData, timelineData]) => {
+    Promise.all([api.getStories(), api.getLegends(), api.getTimeline(), api.getChronicleBook()])
+      .then(([storyData, legendData, timelineData, bookData]) => {
         setStories(storyData.stories || []);
         setLegends(legendData.legends || []);
         setTimeline(timelineData.events || []);
+        setBook(bookData || { arcs: [] });
       })
       .catch(() => {});
   }, []);
@@ -43,6 +45,7 @@ export default function StoriesArchiveView() {
     { key: "stories", label: t("archive.tabStories") },
     { key: "legends", label: t("archive.tabLegends") },
     { key: "timeline", label: t("archive.tabTimeline") },
+    { key: "book", label: t("archive.tabBook") },
   ];
 
   return (
@@ -226,6 +229,70 @@ export default function StoriesArchiveView() {
               ))}
             </ol>
           </section>
+        </>
+      ) : null}
+
+      {tab === "book" ? (
+        <>
+          <p className="text-xs text-parch-500">{t("archive.tabBookDetail")}</p>
+          <div className="space-y-4">
+            {book.arcs.map((arc) => (
+              <article key={arc.key} className="panel overflow-hidden">
+                <div className="flex items-center justify-between gap-3 border-b border-ink-600/70 px-4 py-3">
+                  <div>
+                    <p className="font-mono text-[11px] tabular text-parch-600">{arc.key}</p>
+                    <h3 className="mt-0.5 font-display text-base font-bold text-parch-100">
+                      {arc.title}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-parch-500">{arc.summary}</p>
+                  </div>
+                  <span className="font-mono text-[11px] tabular text-parch-600">
+                    {arc.from} → {arc.to}
+                  </span>
+                </div>
+                <ol className="divide-y divide-ink-600/50">
+                  {arc.beats.map((beat) => (
+                    <li
+                      key={beat.id}
+                      className={`px-4 py-3 ${
+                        beat.status === "current" ? "bg-risk/[0.06]" : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`h-2 w-2 shrink-0 rotate-45 rounded-[2px] ${
+                            beat.status === "passed"
+                              ? "bg-brass"
+                              : beat.status === "current"
+                                ? "bg-risk"
+                                : "bg-ink-600"
+                          }`}
+                        />
+                        <p className="text-xs font-semibold text-parch-200">
+                          {beat.index}. {beat.title}
+                        </p>
+                        <span className="ml-auto font-mono text-[10px] tabular text-parch-600">
+                          {beat.date}
+                        </span>
+                      </div>
+                      {beat.status === "current" ? (
+                        <div className="mt-2 rounded-[3px] border border-risk/30 bg-ink-900/60 px-3 py-2">
+                          <p className="text-[11px] italic leading-5 text-parch-400">{beat.prose}</p>
+                          {beat.objective ? (
+                            <p className="mt-1.5 text-[11px] text-parch-500">
+                              {beat.objective.label}: {beat.objective.current.toLocaleString()} /{" "}
+                              {beat.objective.target.toLocaleString()}
+                              {beat.objective.met ? ` · ${t("chronicle.met")}` : ""}
+                            </p>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </li>
+                  ))}
+                </ol>
+              </article>
+            ))}
+          </div>
         </>
       ) : null}
     </div>

@@ -64,10 +64,12 @@ export function AppProvider({ children }) {
   const [storyOpen, setStoryOpen] = useState(false);
   const [chronicle, setChronicle] = useState(null);
   const [chronicleOpen, setChronicleOpen] = useState(false);
+  const [eraTransition, setEraTransition] = useState(null);
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
   const chronicleBeatRef = useRef(null);
+  const prevYearRef = useRef(null);
 
   useEffect(() => {
     setApiLanguage(lang);
@@ -200,6 +202,14 @@ export function AppProvider({ children }) {
           api.getChronicle(),
         ]);
       setGameState(state);
+      const currentYear = String(state?.market?.date || "").slice(0, 4);
+      if (prevYearRef.current && currentYear && currentYear !== prevYearRef.current) {
+        setEraTransition({
+          year: currentYear,
+          grade: chronicleData?.grade || null,
+        });
+      }
+      prevYearRef.current = currentYear;
       setPortfolio(portfolioData);
       setLeaderboard(leaderboardData);
       setAchievements(achievementsData);
@@ -219,6 +229,7 @@ export function AppProvider({ children }) {
   }, [addToast, t]);
 
   const closeChronicle = useCallback(() => setChronicleOpen(false), []);
+  const closeEraTransition = useCallback(() => setEraTransition(null), []);
 
   const login = useCallback(
     async (username, password) => {
@@ -401,6 +412,8 @@ export function AppProvider({ children }) {
       chronicle,
       chronicleOpen,
       closeChronicle,
+      eraTransition,
+      closeEraTransition,
       openStory,
       nextStory,
       closeStory,
@@ -442,6 +455,8 @@ export function AppProvider({ children }) {
       chronicle,
       chronicleOpen,
       closeChronicle,
+      eraTransition,
+      closeEraTransition,
       openStory,
       nextStory,
       closeStory,

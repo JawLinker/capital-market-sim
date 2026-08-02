@@ -106,6 +106,28 @@ def check_all(db: Session, player: models.Player) -> list[str]:
     check("day_30", state.day >= 30)
     check("day_100", state.day >= 100)
 
+    try:
+        from .chronicle import build_chronicle
+
+        chronicle = build_chronicle(db, player, state.date, "en")
+        current = next(
+            (beat for beat in chronicle["beats"] if beat["status"] == "current"),
+            None,
+        )
+        if current and current.get("objective") and current["objective"]["met"]:
+            kind = current["objective"]["type"]
+            code_by_kind = {
+                "tech_exposure": "chronicle_tech",
+                "tech_holdings": "chronicle_tech",
+                "tech_return": "chronicle_profit",
+                "cash_ratio": "chronicle_cash",
+                "total_return": "chronicle_survivor",
+            }
+            if kind in code_by_kind:
+                check(code_by_kind[kind], True)
+    except Exception:
+        pass
+
     db.commit()
     return unlocked
 

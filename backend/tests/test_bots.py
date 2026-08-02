@@ -1,6 +1,6 @@
 def test_bots_are_seeded(client):
     data = client.get("/api/bots").json()
-    assert len(data["bots"]) == 36
+    assert len(data["bots"]) == 40
     for bot in data["bots"]:
         assert bot["positions"] > 0
         assert bot["value"] > 0
@@ -33,7 +33,7 @@ def test_reset_clears_bot_trades(client):
     client.post("/api/game/reset")
     data = client.get("/api/bots").json()
     assert data["recent_trades"] == []
-    assert len(data["bots"]) == 36
+    assert len(data["bots"]) == 40
 
 
 def test_bot_history_endpoint(client):

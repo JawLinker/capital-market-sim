@@ -16,5 +16,5 @@ def test_leaderboard_contains_player_and_rivals(client):
     assert "player" in kinds
     assert "rival" in kinds
     assert "benchmark" in kinds
-    assert data["total_entries"] == 38
+    assert data["total_entries"] == 42
     assert 1 <= data["player_rank"] <= 38

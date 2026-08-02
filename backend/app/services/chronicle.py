@@ -428,6 +428,7 @@ def build_chronicle(db: Session, player: models.Player, date: str, lang: str) ->
         if status == "current":
             result = _evaluate_objective(db, player, beat["objective"], lang)
             objective = {
+                "type": beat["objective"]["type"],
                 "label": result["label"],
                 "current": result["current"],
                 "target": result["target"],
@@ -446,6 +447,21 @@ def build_chronicle(db: Session, player: models.Player, date: str, lang: str) ->
         )
     if current_beat is None:
         current_beat = arc["beats"][-1]["id"]
+    total = _player_value(db, player)
+    total_return = (total / player.starting_cash - 1.0) * 100 if player.starting_cash else 0.0
+    if total_return >= 20:
+        grade_key = "gold"
+        grade_label = "黄金时代" if zh else "Golden Age"
+    elif total_return >= 0:
+        grade_key = "silver"
+        grade_label = "白银时代" if zh else "Silver Age"
+    elif total_return >= -20:
+        grade_key = "bronze"
+        grade_label = "青铜时代" if zh else "Bronze Age"
+    else:
+        grade_key = "dark"
+        grade_label = "黑暗时代" if zh else "Dark Age"
+
     return {
         "arc_key": arc["key"],
         "title": arc["title_zh"] if zh else arc["title_en"],
@@ -453,5 +469,63 @@ def build_chronicle(db: Session, player: models.Player, date: str, lang: str) ->
         "stamp": CHRONICLE_STAMP["zh" if zh else "en"],
         "current_beat": current_beat,
         "completed": completed,
+        "grade": {
+            "key": grade_key,
+            "label": grade_label,
+            "return_pct": round(total_return, 2),
+        },
         "beats": beats,
     }
+
+
+def arc_book(db: Session, player: models.Player, date: str, lang: str) -> dict:
+    zh = lang == "zh"
+    arcs = []
+    for arc in ARCS:
+        beats = []
+        current_beat = None
+        for index, beat in enumerate(arc["beats"]):
+            if date > arc["to"]:
+                status = "passed"
+            elif date < arc["from"]:
+                status = "locked"
+            elif beat["date"] <= date:
+                status = "passed"
+            elif current_beat is None:
+                status = "current"
+                current_beat = beat["id"]
+            else:
+                status = "locked"
+            objective = None
+            if status == "current":
+                result = _evaluate_objective(db, player, beat["objective"], lang)
+                objective = {
+                    "type": beat["objective"]["type"],
+                    "label": result["label"],
+                    "current": result["current"],
+                    "target": result["target"],
+                    "met": result["met"],
+                }
+            beats.append(
+                {
+                    "id": beat["id"],
+                    "date": beat["date"],
+                    "index": index + 1,
+                    "status": status,
+                    "title": beat["title_zh"] if zh else beat["title_en"],
+                    "prose": beat["prose_zh"] if zh else beat["prose_en"],
+                    "objective": objective,
+                }
+            )
+        arcs.append(
+            {
+                "key": arc["key"],
+                "title": arc["title_zh"] if zh else arc["title_en"],
+                "summary": arc["summary_zh"] if zh else arc["summary_en"],
+                "from": arc["from"],
+                "to": arc["to"],
+                "current_beat": current_beat,
+                "beats": beats,
+            }
+        )
+    return {"arcs": arcs}

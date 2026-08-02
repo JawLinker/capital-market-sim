@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -25,6 +25,24 @@ const CYCLE_ACTION = {
   recession: "home.actionRecession",
 };
 
+const BARRAGE_ZH = [
+  "敢死队今天又上榜了",
+  "下一棒是谁？",
+  "算力订单还能再涨吗",
+  "我已经全仓梭哈了",
+  "关灯吃面的位置越来越多了",
+  "别追高，会挨打的",
+];
+
+const BARRAGE_EN = [
+  "The commandos are on the leaderboard again",
+  "Who takes the baton next?",
+  "Can compute orders keep rising?",
+  "I am all in already",
+  "More noodles eaten in the dark",
+  "Chasing highs ends in pain",
+];
+
 export default function DashboardView() {
   const {
     gameState,
@@ -48,6 +66,13 @@ export default function DashboardView() {
   const eras = playableEras(lang);
   const cycleLabel = t(`cycle.${market?.market_cycle}`);
   const recentNews = (news || []).slice(-8).reverse();
+  const [barrageIndex, setBarrageIndex] = useState(0);
+  const barrage = lang === "zh" ? BARRAGE_ZH : BARRAGE_EN;
+  useEffect(() => {
+    if (chronicle?.arc_key !== "2026") return undefined;
+    const timer = window.setInterval(() => setBarrageIndex((index) => index + 1), 2600);
+    return () => window.clearInterval(timer);
+  }, [chronicle?.arc_key]);
   const allocationBreakdown = portfolio?.allocation?.breakdown || [];
   const performanceSeries =
     portfolio?.performance?.series.map((point) => ({
@@ -98,6 +123,14 @@ export default function DashboardView() {
             </li>
           ))}
         </ol>
+        {chronicle?.arc_key === "2026" ? (
+          <div className="mt-3 overflow-hidden rounded-[3px] border border-brass/35 bg-ink-900/70 px-3 py-2">
+            <p className="flex items-center gap-2 text-[11px] text-brass">
+              <ScrollText size={12} className="shrink-0" />
+              <span className="truncate">{barrage[barrageIndex % barrage.length]}</span>
+            </p>
+          </div>
+        ) : null}
         {(() => {
           const current = (chronicle?.beats || []).find((beat) => beat.status === "current");
           const objective = current?.objective;

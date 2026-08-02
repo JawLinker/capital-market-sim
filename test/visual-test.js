@@ -133,6 +133,7 @@ async function canvasCheck(page, label) {
 
   await page.getByTitle("Milestones").click();
   await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
+  await page.waitForSelector("text=The Noodle Man", { timeout: 15000 });
   await page.waitForTimeout(800);
   await shot(page, "07-achievements.png");
 
@@ -148,6 +149,10 @@ async function canvasCheck(page, label) {
   await page.waitForSelector("text=1988", { timeout: 15000 });
   await page.waitForTimeout(600);
   await shot(page, "18-timeline.png");
+  await page.getByRole("button", { name: "Chronicle Book" }).click();
+  await page.waitForSelector("text=2021", { timeout: 15000 });
+  await page.waitForTimeout(600);
+  await shot(page, "19-chronicle-book.png");
   await page.getByTitle("Milestones").click();
   await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
 
