@@ -24,6 +24,8 @@ Every price move is real history, replayed day by day.
 - **Realistic ecosystem**: 8 institutional strategies and 28 behavior-driven
   retail bots trade daily with real holdings; their order flow moves prices and
   their returns span large losses to large gains
+- **Retail investor stories**: a funny fictional story pops up after each
+  trading day, with 20+ bilingual tales and a "tell me another" mode
 - **Full product surface**: dashboard, market terminal, portfolio analytics,
   rule-based AI advisor, achievements, manager archives, leaderboard, and
   English/Chinese UI

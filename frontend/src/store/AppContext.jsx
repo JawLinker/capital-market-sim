@@ -60,6 +60,8 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [toasts, setToasts] = useState([]);
+  const [story, setStory] = useState(null);
+  const [storyOpen, setStoryOpen] = useState(false);
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
@@ -124,6 +126,28 @@ export function AppProvider({ children }) {
   const dismissToast = useCallback((id) => {
     setToasts((current) => current.filter((toast) => toast.id !== id));
   }, []);
+
+  const loadStory = useCallback(async (random = false) => {
+    try {
+      const next = random ? await api.getRandomStory() : await api.getTodayStory();
+      setStory(next);
+      return next;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const openStory = useCallback(async () => {
+    const current = story || (await loadStory(false));
+    if (current) setStoryOpen(true);
+  }, [story, loadStory]);
+
+  const nextStory = useCallback(async () => {
+    const next = await loadStory(true);
+    if (next) setStoryOpen(true);
+  }, [loadStory]);
+
+  const closeStory = useCallback(() => setStoryOpen(false), []);
 
   const announceUnlocks = useCallback(
     (unlocked) => {
@@ -258,12 +282,16 @@ export function AppProvider({ children }) {
       addToast("success", t("toast.advanced", { days: result.days_advanced }));
       announceUnlocks(result.unlocked_achievements);
       await Promise.all([refreshAll(), loadMarket()]);
+      const todayStory = await loadStory(false);
+      if (todayStory && result.days_advanced === 1) {
+        setStoryOpen(true);
+      }
     } catch (error) {
       addToast("error", t("toast.couldNotAdvance"), error.message);
     } finally {
       setBusy(false);
     }
-  }, [busy, refreshAll, loadMarket, announceUnlocks, addToast, t]);
+  }, [busy, refreshAll, loadMarket, announceUnlocks, loadStory, addToast, t]);
 
   const executeTrade = useCallback(
     async (action, ticker, shares, displayName) => {
@@ -351,6 +379,11 @@ export function AppProvider({ children }) {
       loading,
       busy,
       lang,
+      story,
+      storyOpen,
+      openStory,
+      nextStory,
+      closeStory,
       authPlayer,
       authChecked,
       login,
@@ -384,6 +417,11 @@ export function AppProvider({ children }) {
       loading,
       busy,
       lang,
+      story,
+      storyOpen,
+      openStory,
+      nextStory,
+      closeStory,
       authPlayer,
       authChecked,
       login,

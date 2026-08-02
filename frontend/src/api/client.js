@@ -57,6 +57,8 @@ export const api = {
     request(`/api/stocks/${encodeURIComponent(ticker)}/history?limit=${limit}`),
   getIndexHistory: (limit = 510) => request(`/api/index/history?limit=${limit}`),
   getNews: (limit = 20) => request(`/api/news?limit=${limit}`),
+  getTodayStory: () => request("/api/stories/today"),
+  getRandomStory: () => request("/api/stories/random"),
   getPortfolio: () => request("/api/portfolio"),
   getAdvisorReport: () => request("/api/advisor/portfolio"),
   advisorChat: (message) =>

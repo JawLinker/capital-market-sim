@@ -6,6 +6,7 @@ import {
   Globe,
   LayoutDashboard,
   LogOut,
+  MessageCircleMore,
   Play,
   RotateCcw,
   Sparkles,
@@ -15,6 +16,7 @@ import { useState } from "react";
 
 import { useApp } from "../../store/AppContext.jsx";
 import { CYCLE_META, money, percent, toneClass } from "../../utils/format.js";
+import RetailStoryModal from "../story/RetailStoryModal.jsx";
 
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -66,7 +68,7 @@ function Sidebar() {
 }
 
 function TopBar() {
-  const { gameState, advanceDay, resetGame, busy, t, lang, setLang, authPlayer, logout } = useApp();
+  const { gameState, advanceDay, resetGame, busy, t, lang, setLang, authPlayer, logout, openStory } = useApp();
   const [fastDays, setFastDays] = useState(30);
   const market = gameState?.market;
   const cycle = CYCLE_META[market?.market_cycle] || CYCLE_META.recovery;
@@ -160,6 +162,14 @@ function TopBar() {
           </>
         ) : null}
         <button
+          onClick={openStory}
+          className="btn btn-ghost px-2.5"
+          title={t("story.button")}
+        >
+          <MessageCircleMore size={16} />
+          <span className="hidden sm:inline">{t("story.button")}</span>
+        </button>
+        <button
           onClick={() => setLang(lang === "en" ? "zh" : "en")}
           className="btn btn-ghost px-2.5"
           title={lang === "en" ? "切换到中文" : "Switch to English"}
@@ -209,7 +219,7 @@ function TopBar() {
 }
 
 export default function AppShell({ children }) {
-  const { loading, t } = useApp();
+  const { loading, t, storyOpen } = useApp();
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -227,6 +237,7 @@ export default function AppShell({ children }) {
         <TopBar />
         <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
       </div>
+      {storyOpen ? <RetailStoryModal /> : null}
     </div>
   );
 }

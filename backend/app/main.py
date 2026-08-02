@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import FRONTEND_DIST
 from .database import Base, SessionLocal, engine, ensure_schema_compat
-from .routers import advisor, auth, bots, earnings, gamification, game, news, players, portfolio, stocks, trades
+from .routers import advisor, auth, bots, earnings, gamification, game, news, players, portfolio, stocks, stories, trades
 from .seed import seed_database
 
 
@@ -48,6 +48,7 @@ app.include_router(auth.router)
 app.include_router(news.router)
 app.include_router(advisor.router)
 app.include_router(gamification.router)
+app.include_router(stories.router)
 
 if FRONTEND_DIST is not None:
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
