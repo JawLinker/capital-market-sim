@@ -1,4 +1,4 @@
-import { MessageCircleMore, Quote, X } from "lucide-react";
+import { Flame, Quote, X } from "lucide-react";
 
 import { useApp } from "../../store/AppContext.jsx";
 
@@ -8,9 +8,9 @@ export default function RetailStoryModal() {
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-ink-950/70 p-4">
-      <div className="panel w-full max-w-md overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-ink-600/70 bg-ink-800/70 px-4 py-3">
-          <MessageCircleMore size={16} className="text-gold" />
+      <div className="panel w-full max-w-md overflow-hidden border-risk/30">
+        <div className="flex items-center gap-2 border-b border-risk/25 bg-ink-850 px-4 py-3">
+          <Flame size={16} className="text-risk" />
           <h2 className="text-sm font-semibold text-slate-100">{t("story.title")}</h2>
           <button
             onClick={closeStory}
@@ -20,11 +20,25 @@ export default function RetailStoryModal() {
             <X size={16} />
           </button>
         </div>
-        <div className="space-y-3 p-5">
-          <span className="inline-flex rounded border border-gold/40 bg-gold/10 px-2 py-0.5 text-[11px] font-semibold text-gold">
+        <div className="space-y-3 bg-gradient-to-b from-risk/[0.06] to-transparent p-5">
+          <span className="inline-flex items-center gap-1.5 rounded border border-risk/40 bg-risk/10 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-risk">
+            <Flame size={11} />
             {story.tag}
           </span>
-          <h3 className="text-lg font-bold leading-6 text-slate-50">{story.title}</h3>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+              {story.era}
+            </p>
+            <h3 className="mt-1 text-xl font-bold leading-7 text-slate-50">{story.title}</h3>
+          </div>
+          <p className="border-l-2 border-risk/40 pl-3 text-sm italic leading-6 text-slate-400">
+            {story.prologue}
+          </p>
+          <div className="flex items-center gap-2 py-1">
+            <span className="h-px flex-1 bg-ink-600/70" />
+            <Flame size={12} className="text-risk/70" />
+            <span className="h-px flex-1 bg-ink-600/70" />
+          </div>
           <p className="text-sm leading-6 text-slate-300">{story.story}</p>
           <p className="text-[11px] text-slate-500">{t("story.fiction")}</p>
           <div className="flex justify-end gap-2 pt-2">

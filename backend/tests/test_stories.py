@@ -6,7 +6,9 @@ def test_today_story_is_deterministic(client):
     body = first.json()
     assert body["id"].startswith("s")
     assert body["tag"]
+    assert body["era"]
     assert body["title"]
+    assert body["prologue"]
     assert body["story"]
 
 
