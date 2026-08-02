@@ -1,0 +1,14 @@
+{
+  "name": "capital-market-sim",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A realistic stock market simulation game built with React, FastAPI, and SQLite.",
+  "scripts": {
+    "build": "npm --prefix frontend run build",
+    "test:backend": "cd backend && pytest -q",
+    "test:e2e": "node test/visual-test.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.45.0"
+  }
+}

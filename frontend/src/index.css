@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink-900 text-slate-200 antialiased;
+  font-feature-settings: "tnum" 1, "cv01" 1;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #33465a #0d141c;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #0d141c;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #33465a;
+  border-radius: 8px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.panel {
+  @apply rounded-lg border border-ink-600/80 bg-ink-800 shadow-panel;
+}
+
+.panel-header {
+  @apply flex items-center justify-between border-b border-ink-600/70 px-4 py-3;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40;
+}
+
+.btn-primary {
+  @apply border-transparent bg-mint/90 text-ink-950 hover:bg-mint;
+}
+
+.btn-danger {
+  @apply border-transparent bg-risk/85 text-white hover:bg-risk;
+}
+
+.btn-ghost {
+  @apply border-ink-500/60 bg-ink-700/60 text-slate-200 hover:border-ink-500 hover:bg-ink-600;
+}
+
+.input {
+  @apply w-full rounded-md border border-ink-500/60 bg-ink-900/80 px-3 py-2 text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-sky-500/70 focus:ring-2 focus:ring-sky-500/20;
+}
+
+.th {
+  @apply px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500;
+}
+
+.td {
+  @apply px-3 py-2.5 text-sm tabular;
+}
+
+.row-hover {
+  @apply cursor-pointer transition-colors hover:bg-ink-700/50;
+}
