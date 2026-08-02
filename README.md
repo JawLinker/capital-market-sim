@@ -148,6 +148,8 @@ One-click cloud options (the `Dockerfile` is already in the repo):
 - Zeabur: connect the GitHub repo and let it auto-detect the Dockerfile
 - Render: create a Blueprint from `render.yaml`, or add a Web Service with the
   Docker runtime
+- Alibaba Cloud: follow [docs/DEPLOY-ALIYUN.md](docs/DEPLOY-ALIYUN.md) and run
+  `deploy/setup-aliyun.sh` on a lightweight Ubuntu server
 - Any VM with Docker: clone the repo and run `docker compose up -d --build`
 
 Before going public, set `CMS_HOST_PASSWORD` to a random value so strangers
