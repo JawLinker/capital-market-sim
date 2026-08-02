@@ -35,12 +35,15 @@ export default function LoginView() {
     <div className="flex h-full items-center justify-center p-4">
       <div className="panel w-full max-w-sm p-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-mint/80 to-sky/70 text-ink-950">
+          <div className="flex h-10 w-10 items-center justify-center rounded-[3px] border border-brass/50 bg-brass/15 text-brass">
             <CandlestickChart size={20} strokeWidth={2.4} />
           </div>
           <div>
-            <h1 className="text-base font-bold text-slate-100">{t("app.name")}</h1>
-            <p className="text-xs text-slate-500">{t("auth.subtitle")}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brass">
+              {t("auth.kicker")}
+            </p>
+            <h1 className="font-display text-base font-bold text-parch-100">{t("app.brand")}</h1>
+            <p className="text-xs text-parch-500">{t("auth.subtitle")}</p>
           </div>
         </div>
 
@@ -50,7 +53,7 @@ export default function LoginView() {
             className={`flex items-center justify-center gap-1.5 rounded px-3 py-2 text-sm font-semibold transition-colors ${
               mode === "login"
                 ? "bg-sky/15 text-sky"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-parch-500 hover:text-parch-200"
             }`}
           >
             <LogIn size={15} /> {t("auth.login")}
@@ -60,7 +63,7 @@ export default function LoginView() {
             className={`flex items-center justify-center gap-1.5 rounded px-3 py-2 text-sm font-semibold transition-colors ${
               mode === "register"
                 ? "bg-mint/15 text-mint"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-parch-500 hover:text-parch-200"
             }`}
           >
             <UserPlus size={15} /> {t("auth.register")}
@@ -69,7 +72,7 @@ export default function LoginView() {
 
         <div className="mt-4 space-y-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">
+            <label className="mb-1 block text-xs font-medium text-parch-500">
               {t("auth.username")}
             </label>
             <input
@@ -80,7 +83,7 @@ export default function LoginView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-400">
+            <label className="mb-1 block text-xs font-medium text-parch-500">
               {t("auth.password")}
             </label>
             <input
@@ -102,7 +105,7 @@ export default function LoginView() {
               ? t("topbar.running")
               : t(mode === "login" ? "auth.login" : "auth.register")}
           </button>
-          <p className="text-center text-[11px] leading-4 text-slate-500">
+          <p className="text-center text-[11px] leading-4 text-parch-600">
             {lang === "zh" ? t("auth.hostHintZh") : t("auth.hostHint")}
             <span className="mt-1 block">{t("auth.lanHint")}</span>
           </p>

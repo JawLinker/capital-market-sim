@@ -87,12 +87,12 @@ export default function MarketView() {
       <section className="panel flex min-h-0 flex-col overflow-hidden">
         <div className="panel-header gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-slate-100">{t("market.universeTitle")}</h2>
-            <p className="mt-0.5 text-xs text-slate-500">{t("market.universeDetail")}</p>
+            <h2 className="text-sm font-semibold text-parch-100">{t("market.universeTitle")}</h2>
+            <p className="mt-0.5 text-xs text-parch-600">{t("market.universeDetail")}</p>
           </div>
           <div className="ml-auto flex w-full max-w-md items-center gap-2">
             <div className="relative flex-1">
-              <Search size={14} className="absolute left-2.5 top-2.5 text-slate-500" />
+              <Search size={14} className="absolute left-2.5 top-2.5 text-parch-600" />
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -148,20 +148,20 @@ export default function MarketView() {
                         className="h-1.5 w-1.5 shrink-0 rounded-full"
                         style={{ backgroundColor: industryColor(stock.industry) }}
                       />
-                      <span className="max-w-[170px] truncate font-semibold text-slate-100">
+                      <span className="max-w-[170px] truncate font-semibold text-parch-100">
                         {stock.name}
                       </span>
                     </div>
                   </td>
                   <td className="td">
-                    <span className="text-slate-300">{t(`industry.${stock.industry}`)}</span>
+                    <span className="text-parch-300">{t(`industry.${stock.industry}`)}</span>
                   </td>
-                  <td className="td font-semibold text-slate-100">{money(stock.price)}</td>
+                  <td className="td font-semibold text-parch-100">{money(stock.price)}</td>
                   <td className="td">
                     <Change value={stock.change_pct} />
                   </td>
                   <td className="td"><VolumeCell value={stock.volume} /></td>
-                  <td className="td text-slate-300">{stock.pe_ratio.toFixed(1)}</td>
+                  <td className="td text-parch-300">{stock.pe_ratio.toFixed(1)}</td>
                   <td className="td"><MarketCapCell value={stock.market_cap} /></td>
                   <td className="td">
                     <span className={`tabular ${toneClass(stock.momentum_20d * 100)}`}>
@@ -182,9 +182,9 @@ export default function MarketView() {
               <div className="panel-header">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h2 className="truncate text-base font-bold text-slate-100">{quote.name}</h2>
+                    <h2 className="truncate text-base font-bold text-parch-100">{quote.name}</h2>
                     <Badge
-                      className="border-ink-500/50 capitalize text-slate-400"
+                      className="border-ink-500/50 capitalize text-parch-500"
                     >
                       {t(`industry.${quote.industry}`)}
                     </Badge>
@@ -201,7 +201,7 @@ export default function MarketView() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold tabular text-slate-100">{money(quote.price)}</p>
+                  <p className="text-xl font-bold tabular text-parch-100">{money(quote.price)}</p>
                   <p className={`text-xs font-semibold tabular ${toneClass(quote.change_pct)}`}>
                     {quote.change_pct > 0 ? "+" : ""}{quote.change_pct.toFixed(2)}% {t("market.today")}
                   </p>
@@ -220,8 +220,8 @@ export default function MarketView() {
                   [t("market.quoteDepth"), compactNumber(quote.bid_depth)],
                 ].map(([label, value]) => (
                   <div key={label} className="bg-ink-800 px-2 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
-                    <p className="mt-0.5 truncate text-xs font-semibold tabular text-slate-200">{value}</p>
+                    <p className="text-[10px] uppercase tracking-wide text-parch-600">{label}</p>
+                    <p className="mt-0.5 truncate text-xs font-semibold tabular text-parch-200">{value}</p>
                   </div>
                 ))}
               </div>
@@ -233,8 +233,8 @@ export default function MarketView() {
                   [t("market.quoteMom"), percent(quote.momentum_20d * 100)],
                 ].map(([label, value]) => (
                   <div key={label} className="bg-ink-800 px-2 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
-                    <p className="mt-0.5 truncate text-xs font-semibold tabular text-slate-200">{value}</p>
+                    <p className="text-[10px] uppercase tracking-wide text-parch-600">{label}</p>
+                    <p className="mt-0.5 truncate text-xs font-semibold tabular text-parch-200">{value}</p>
                   </div>
                 ))}
               </div>
@@ -261,13 +261,13 @@ export default function MarketView() {
                   ],
                 ].map(([label, value]) => (
                   <div key={label} className="bg-ink-800 px-2 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
-                    <p className="mt-0.5 truncate text-xs font-semibold tabular text-slate-200">{value}</p>
+                    <p className="text-[10px] uppercase tracking-wide text-parch-600">{label}</p>
+                    <p className="mt-0.5 truncate text-xs font-semibold tabular text-parch-200">{value}</p>
                   </div>
                 ))}
               </div>
               <div className="p-2">
-                <div className="mb-1 flex items-center justify-end gap-3 px-1 text-[10px] font-medium text-slate-500">
+                <div className="mb-1 flex items-center justify-end gap-3 px-1 text-[10px] font-medium text-parch-600">
                   <span>
                     <span className="mr-1 font-bold text-mint">B</span>
                     {t("market.markerBuy")}
@@ -285,8 +285,8 @@ export default function MarketView() {
 
             <div className="panel">
               <div className="panel-header">
-                <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-100">
-                  <Newspaper size={15} className="text-slate-500" /> {t("market.newsFeed")}
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-parch-100">
+                  <Newspaper size={15} className="text-parch-600" /> {t("market.newsFeed")}
                 </h3>
               </div>
               <ul className="max-h-72 divide-y divide-ink-600/50 overflow-y-auto">
@@ -299,24 +299,24 @@ export default function MarketView() {
                             ? "border-mint/40 bg-mint/10 text-mint"
                             : event.category === "negative"
                               ? "border-risk/40 bg-risk/10 text-risk"
-                              : "border-slate-500/40 bg-slate-500/10 text-slate-300"
+                              : "border-slate-500/40 bg-slate-500/10 text-parch-300"
                         }
                       >
                         {t(`news.${event.category}`)}
                       </Badge>
-                      <span className="text-[10px] uppercase text-slate-500">{t(`news.scope.${event.scope}`)}</span>
+                      <span className="text-[10px] uppercase text-parch-600">{t(`news.scope.${event.scope}`)}</span>
                       {event.ticker ? (
                         <span className="text-[10px] font-semibold text-sky">
                           {event.company || event.ticker}
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-1 text-xs font-medium leading-4 text-slate-200">{event.headline}</p>
-                    <p className="mt-1 text-[11px] leading-4 text-slate-500">{event.summary}</p>
+                    <p className="mt-1 text-xs font-medium leading-4 text-parch-200">{event.headline}</p>
+                    <p className="mt-1 text-[11px] leading-4 text-parch-600">{event.summary}</p>
                   </li>
                 ))}
                 {(news || []).length === 0 ? (
-                  <li className="px-4 py-6 text-center text-xs text-slate-500">
+                  <li className="px-4 py-6 text-center text-xs text-parch-600">
                     {t("market.advanceForNews")}
                   </li>
                 ) : null}
@@ -324,7 +324,7 @@ export default function MarketView() {
             </div>
           </>
         ) : (
-          <div className="panel flex flex-1 items-center justify-center p-8 text-sm text-slate-500">
+          <div className="panel flex flex-1 items-center justify-center p-8 text-sm text-parch-600">
             {t("market.selectStock")}
           </div>
         )}

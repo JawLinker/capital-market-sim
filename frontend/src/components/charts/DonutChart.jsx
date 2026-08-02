@@ -51,11 +51,11 @@ export default function DonutChart({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         {centerTitle ? (
-          <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-parch-600">
             {centerTitle}
           </span>
         ) : null}
-        <span className="text-lg font-semibold text-slate-100 tabular">{centerValue}</span>
+        <span className="text-lg font-semibold text-parch-100 tabular">{centerValue}</span>
       </div>
     </div>
   );

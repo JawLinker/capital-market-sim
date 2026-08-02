@@ -25,11 +25,11 @@ function Toast({ id, kind, title, detail, onClose }) {
     <div className={`panel border-l-4 ${styles} flex w-80 items-start gap-3 px-4 py-3`}>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold">{title}</p>
-        {detail ? <p className="mt-0.5 text-xs text-slate-400">{detail}</p> : null}
+        {detail ? <p className="mt-0.5 text-xs text-parch-500">{detail}</p> : null}
       </div>
       <button
         onClick={onClose}
-        className="rounded px-1 text-slate-500 hover:text-slate-200"
+        className="rounded px-1 text-parch-600 hover:text-parch-200"
         aria-label="Dismiss"
       >
         ×

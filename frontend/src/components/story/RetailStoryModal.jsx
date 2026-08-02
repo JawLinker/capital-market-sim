@@ -11,10 +11,10 @@ export default function RetailStoryModal() {
       <div className="panel w-full max-w-md overflow-hidden border-risk/30">
         <div className="flex items-center gap-2 border-b border-risk/25 bg-ink-850 px-4 py-3">
           <Flame size={16} className="text-risk" />
-          <h2 className="text-sm font-semibold text-slate-100">{t("story.archiveTitle")}</h2>
+          <h2 className="text-sm font-semibold text-parch-100">{t("story.archiveTitle")}</h2>
           <button
             onClick={closeStory}
-            className="ml-auto rounded p-1 text-slate-500 transition-colors hover:bg-ink-700 hover:text-slate-200"
+            className="ml-auto rounded p-1 text-parch-600 transition-colors hover:bg-ink-700 hover:text-parch-200"
             aria-label={t("story.dismiss")}
           >
             <X size={16} />
@@ -26,35 +26,35 @@ export default function RetailStoryModal() {
               <Flame size={11} />
               {story.tag}
             </span>
-            <span className="font-mono text-[11px] tabular text-slate-500">{story.file_no}</span>
+            <span className="font-mono text-[11px] tabular text-parch-600">{story.file_no}</span>
           </div>
           <div className="grid grid-cols-3 gap-2 rounded-md border border-ink-600/70 bg-ink-900/60 p-2 text-[10px]">
             <div className="min-w-0">
-              <p className="flex items-center gap-1 text-slate-500">
+              <p className="flex items-center gap-1 text-parch-600">
                 <Hash size={10} />
                 {t("archive.fileNo")}
               </p>
-              <p className="mt-0.5 truncate font-mono text-slate-300">{story.file_no}</p>
+              <p className="mt-0.5 truncate font-mono text-parch-300">{story.file_no}</p>
             </div>
             <div className="min-w-0">
-              <p className="flex items-center gap-1 text-slate-500">
+              <p className="flex items-center gap-1 text-parch-600">
                 <CalendarDays size={10} />
                 {t("archive.recordDate")}
               </p>
-              <p className="mt-0.5 truncate text-slate-300">{story.date}</p>
+              <p className="mt-0.5 truncate text-parch-300">{story.date}</p>
             </div>
             <div className="min-w-0">
-              <p className="flex items-center gap-1 text-slate-500">
+              <p className="flex items-center gap-1 text-parch-600">
                 <User size={10} />
                 {t("archive.source")}
               </p>
-              <p className="mt-0.5 truncate text-slate-300">{story.source}</p>
+              <p className="mt-0.5 truncate text-parch-300">{story.source}</p>
             </div>
           </div>
           <div>
-            <h3 className="mt-1 text-xl font-bold leading-7 text-slate-50">{story.title}</h3>
+            <h3 className="mt-1 text-xl font-bold leading-7 text-parch-100">{story.title}</h3>
           </div>
-          <p className="border-l-2 border-risk/40 pl-3 text-sm italic leading-6 text-slate-400">
+          <p className="border-l-2 border-risk/40 pl-3 text-sm italic leading-6 text-parch-500">
             {story.prologue}
           </p>
           <div className="flex items-center gap-2 py-1">
@@ -66,9 +66,9 @@ export default function RetailStoryModal() {
             <span className="absolute -top-1 right-0 rotate-6 rounded border-2 border-risk/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-risk/80">
               {story.stamp}
             </span>
-            <p className="pr-24 text-sm leading-6 text-slate-300">{story.story}</p>
+            <p className="pr-24 text-sm leading-6 text-parch-300">{story.story}</p>
           </div>
-          <p className="text-[11px] text-slate-500">{t("story.fiction")}</p>
+          <p className="text-[11px] text-parch-600">{t("story.fiction")}</p>
           <div className="flex justify-end gap-2 pt-2">
             <button onClick={nextStory} className="btn btn-ghost px-3">
               <Quote size={14} />

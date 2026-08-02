@@ -97,7 +97,7 @@ async function canvasCheck(page, label) {
   await loginHost(page);
   await shot(page, "01-dashboard.png");
 
-  await page.getByTitle("Market").click();
+  await page.getByTitle("Market Records").click();
   await page.waitForSelector("text=Stock universe", { timeout: 15000 });
   await page.waitForTimeout(1200);
   await canvasCheck(page, "market price chart");
@@ -117,29 +117,29 @@ async function canvasCheck(page, label) {
   await shot(page, "15-retail-story.png");
   await page.getByRole("button", { name: "Got it" }).click();
 
-  await page.getByTitle("Portfolio").click();
+  await page.getByTitle("Investor Journal").click();
   await page.waitForSelector("text=Holdings", { timeout: 15000 });
   await page.waitForTimeout(1000);
   await canvasCheck(page, "portfolio equity chart");
   await shot(page, "05-portfolio.png");
 
-  await page.getByTitle("Advisor").click();
+  await page.getByTitle("Analyst Notes").click();
   await page.waitForSelector("text=Portfolio health report", { timeout: 15000 });
   await page.getByRole("button", { name: "How is my diversification?" }).click();
   await page.waitForSelector("text=Diversification scores", { timeout: 15000 });
   await page.waitForTimeout(600);
   await shot(page, "06-advisor.png");
 
-  await page.getByTitle("Achievements").click();
+  await page.getByTitle("Milestones").click();
   await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
   await page.waitForTimeout(800);
   await shot(page, "07-achievements.png");
 
-  await page.getByTitle("Archive").click();
+  await page.getByTitle("Story Archive").click();
   await page.waitForSelector("text=Retail Era Archive", { timeout: 15000 });
   await page.waitForTimeout(800);
   await shot(page, "16-archive.png");
-  await page.getByTitle("Achievements").click();
+  await page.getByTitle("Milestones").click();
   await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -156,11 +156,11 @@ async function canvasCheck(page, label) {
   await mobile.locator(".panel > div > .btn-primary").click();
   await waitForDashboard(mobile);
   await shot(mobile, "08-mobile-dashboard.png");
-  await mobile.getByTitle("Market").click();
+  await mobile.getByTitle("Market Records").click();
   await mobile.waitForSelector("text=Stock universe", { timeout: 15000 });
   await mobile.waitForTimeout(1000);
   await shot(mobile, "09-mobile-market.png");
-  await mobile.getByTitle("Achievements").click();
+  await mobile.getByTitle("Milestones").click();
   await mobile.waitForSelector("text=Investment milestones", { timeout: 15000 });
   await mobile.waitForTimeout(600);
   await shot(mobile, "10-mobile-achievements.png");
@@ -168,23 +168,23 @@ async function canvasCheck(page, label) {
   // Chinese language check
   await page.getByRole("button", { name: "中文" }).click();
   await page.waitForSelector("text=组合市值", { timeout: 20000 });
-  await page.waitForSelector("text=仪表盘", { timeout: 15000 });
+  await page.waitForSelector("text=档案首页", { timeout: 15000 });
   await page.waitForTimeout(1000);
   await shot(page, "11-chinese-dashboard.png");
 
-  await page.getByTitle("市场").click();
+  await page.getByTitle("行情档案").click();
   await page.waitForSelector("text=股票池", { timeout: 15000 });
   await page.waitForTimeout(1000);
   await shot(page, "12-chinese-market.png");
 
-  await page.getByTitle("AI 顾问").click();
+  await page.getByTitle("分析师笔记").click();
   await page.waitForSelector("text=组合健康报告", { timeout: 15000 });
   await page.getByRole("button", { name: "我的分散化如何？" }).click();
   await page.waitForSelector("text=分散化得分", { timeout: 15000 });
   await page.waitForTimeout(600);
   await shot(page, "13-chinese-advisor.png");
 
-  await page.getByTitle("成就").click();
+  await page.getByTitle("投资里程碑").click();
   await page.waitForSelector("text=投资里程碑", { timeout: 15000 });
   await page.waitForTimeout(600);
   await shot(page, "14-chinese-achievements.png");

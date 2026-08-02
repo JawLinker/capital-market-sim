@@ -6,20 +6,21 @@ export function StatCard({ label, value, sub, tone = "default", icon }) {
       ? "text-mint"
       : tone === "negative"
         ? "text-risk"
-        : "text-slate-100";
+        : "text-parch-100";
   return (
-    <div className="panel flex min-w-0 items-center justify-between gap-3 px-4 py-3.5">
+    <div className="panel relative flex min-w-0 items-center justify-between gap-3 overflow-hidden px-4 py-3.5">
+      <span className="absolute left-0 top-0 h-full w-0.5 bg-gradient-to-b from-brass/70 to-transparent" />
       <div className="min-w-0">
-        <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-parch-500">
           {label}
         </p>
         <p className={`mt-1 truncate text-xl font-semibold tabular ${valueClass}`}>
           {value}
         </p>
-        {sub ? <p className="mt-0.5 truncate text-xs text-slate-400">{sub}</p> : null}
+        {sub ? <p className="mt-0.5 truncate text-xs text-parch-500">{sub}</p> : null}
       </div>
       {icon ? (
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-ink-600 bg-ink-700/60 text-slate-400">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border border-brass/40 bg-ink-700/60 text-brass">
           {icon}
         </div>
       ) : null}
@@ -30,7 +31,7 @@ export function StatCard({ label, value, sub, tone = "default", icon }) {
 export function Badge({ children, className = "" }) {
   return (
     <span
-      className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[11px] font-medium ${className}`}
+      className={`inline-flex items-center rounded-[3px] border px-1.5 py-0.5 text-[11px] font-medium ${className}`}
     >
       {children}
     </span>
@@ -51,7 +52,7 @@ export function Change({ value, suffix = "%", className = "" }) {
 export function ScoreRing({ score, size = 92, label }) {
   const radius = (size - 10) / 2;
   const circumference = 2 * Math.PI * radius;
-  const color = score >= 70 ? "#22c55e" : score >= 45 ? "#f59e0b" : "#ef4444";
+  const color = score >= 70 ? "#7ba05b" : score >= 45 ? "#c9a24b" : "#c05a45";
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
@@ -60,7 +61,7 @@ export function ScoreRing({ score, size = 92, label }) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="rgba(51, 70, 90, 0.35)"
+          stroke="rgba(176, 141, 87, 0.25)"
           strokeWidth={8}
         />
         <circle
@@ -75,8 +76,8 @@ export function ScoreRing({ score, size = 92, label }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-bold tabular text-slate-100">{score}</span>
-        {label ? <span className="text-[10px] uppercase tracking-wide text-slate-500">{label}</span> : null}
+        <span className="font-display text-xl font-bold tabular text-parch-100">{score}</span>
+        {label ? <span className="text-[10px] uppercase tracking-wide text-parch-500">{label}</span> : null}
       </div>
     </div>
   );
@@ -84,7 +85,7 @@ export function ScoreRing({ score, size = 92, label }) {
 
 export function ProgressBar({ value, color = "#38bdf8", className = "" }) {
   return (
-    <div className={`h-1.5 w-full overflow-hidden rounded-full bg-ink-600/60 ${className}`}>
+    <div className={`h-1.5 w-full overflow-hidden rounded-full bg-ink-600/70 ${className}`}>
       <div
         className="h-full rounded-full transition-all"
         style={{ width: `${Math.max(0, Math.min(100, value * 100))}%`, backgroundColor: color }}
@@ -95,21 +96,21 @@ export function ProgressBar({ value, color = "#38bdf8", className = "" }) {
 
 export function MarketCapCell({ value }) {
   return (
-    <span className="tabular text-slate-300">
+    <span className="tabular text-parch-300">
       ${compactNumber(value)}
     </span>
   );
 }
 
 export function VolumeCell({ value }) {
-  return <span className="tabular text-slate-400">{compactNumber(value)}</span>;
+  return <span className="tabular text-parch-500">{compactNumber(value)}</span>;
 }
 
 export function EmptyState({ title, detail }) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-10 text-center">
-      <p className="text-sm font-medium text-slate-300">{title}</p>
-      <p className="mt-1 max-w-sm text-xs leading-5 text-slate-500">{detail}</p>
+      <p className="font-display text-sm font-semibold text-parch-200">{title}</p>
+      <p className="mt-1 max-w-sm text-xs leading-5 text-parch-500">{detail}</p>
     </div>
   );
 }
@@ -118,8 +119,8 @@ export function SectionTitle({ title, detail, right }) {
   return (
     <div className="panel-header">
       <div>
-        <h2 className="text-sm font-semibold text-slate-100">{title}</h2>
-        {detail ? <p className="mt-0.5 text-xs text-slate-500">{detail}</p> : null}
+        <h2 className="font-display text-[15px] font-semibold tracking-wide text-parch-100">{title}</h2>
+        {detail ? <p className="mt-0.5 text-xs text-parch-500">{detail}</p> : null}
       </div>
       {right}
     </div>

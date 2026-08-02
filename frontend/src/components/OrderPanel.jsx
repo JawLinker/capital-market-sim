@@ -53,8 +53,8 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
   return (
     <div className="panel">
       <div className="panel-header">
-        <h3 className="truncate text-sm font-semibold text-slate-100">{t("order.title", { ticker: stock.name })}</h3>
-        <span className="text-xs tabular text-slate-400">{money(stock.price)}</span>
+        <h3 className="truncate text-sm font-semibold text-parch-100">{t("order.title", { ticker: stock.name })}</h3>
+        <span className="text-xs tabular text-parch-500">{money(stock.price)}</span>
       </div>
       <div className="grid grid-cols-2 gap-1 border-b border-ink-600/70 p-2">
         <button
@@ -62,7 +62,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
           className={`flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-semibold transition-colors ${
             action === "buy"
               ? "border-mint/50 bg-mint/15 text-mint"
-              : "border-ink-500/50 text-slate-400 hover:bg-ink-700/50"
+              : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
           }`}
         >
           <ArrowUpCircle size={16} />
@@ -73,7 +73,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
           className={`flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-semibold transition-colors ${
             action === "sell"
               ? "border-risk/50 bg-risk/15 text-risk"
-              : "border-ink-500/50 text-slate-400 hover:bg-ink-700/50"
+              : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
           }`}
         >
           <ArrowDownCircle size={16} />
@@ -82,7 +82,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
       </div>
       <div className="space-y-3 p-4">
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-400">{t("order.shares")}</label>
+          <label className="mb-1.5 block text-xs font-medium text-parch-500">{t("order.shares")}</label>
           <div className="flex gap-2">
             <input
               type="number"
@@ -115,24 +115,24 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         </div>
         <dl className="space-y-1.5 text-xs">
           <div className="flex justify-between">
-            <dt className="text-slate-500">{t("order.gross")}</dt>
-            <dd className="tabular text-slate-300">{money(gross)}</dd>
+            <dt className="text-parch-600">{t("order.gross")}</dt>
+            <dd className="tabular text-parch-300">{money(gross)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-slate-500">{t("order.commission")}</dt>
-            <dd className="tabular text-slate-300">{money(shareCount > 0 ? fee : 0)}</dd>
+            <dt className="text-parch-600">{t("order.commission")}</dt>
+            <dd className="tabular text-parch-300">{money(shareCount > 0 ? fee : 0)}</dd>
           </div>
           {action === "sell" ? (
             <div className="flex justify-between">
-              <dt className="text-slate-500">{t("order.stampTax")}</dt>
-              <dd className="tabular text-slate-300">{money(shareCount > 0 ? stamp : 0)}</dd>
+              <dt className="text-parch-600">{t("order.stampTax")}</dt>
+              <dd className="tabular text-parch-300">{money(shareCount > 0 ? stamp : 0)}</dd>
             </div>
           ) : null}
           <div className="flex justify-between border-t border-ink-600/70 pt-1.5">
-            <dt className="font-medium text-slate-400">
+            <dt className="font-medium text-parch-500">
               {t(action === "buy" ? "order.totalCost" : "order.netProceeds")}
             </dt>
-            <dd className="tabular font-semibold text-slate-100">
+            <dd className="tabular font-semibold text-parch-100">
               {action === "buy" ? money(gross + fee) : money(gross - fee - stamp)}
             </dd>
           </div>
@@ -153,7 +153,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         >
           {t(action === "buy" ? "order.buyShares" : "order.sellShares")}
         </button>
-        <p className="text-[11px] leading-4 text-slate-500">
+        <p className="text-[11px] leading-4 text-parch-600">
           {t("order.minimum", { min: 10, cash: money(cash) })}{" "}
           {action === "sell"
             ? t("order.youHold", { shares: (holding?.shares || 0).toFixed(4) })

@@ -3,7 +3,8 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/JawLinker/capital-market-sim/ci.yml?branch=main&label=CI&logo=github)](https://github.com/JawLinker/capital-market-sim/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A production-style stock market simulation game. Start with ¥100,000 in virtual
+A historical financial archive: a stock market simulation presented as a
+digital museum of financial eras. Start with ¥100,000 in virtual
 cash, trade 50 real A-share companies across five industries, and try to beat
 the Shanghai Composite through bull, bear, recovery, and recession cycles.
 Every price move is real history, replayed day by day.
@@ -16,6 +17,9 @@ Every price move is real history, replayed day by day.
   covering 2019-2026. The first 504 trading days seed chart history; each
   `Advance Day` replays the next real daily OHLC row, so future moves are
   genuine A-share history rather than synthetic noise
+- **Museum experience**: archival dark-room design with a playable era
+  timeline, historical event clippings, an investor journal, and a dossier
+  story archive
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

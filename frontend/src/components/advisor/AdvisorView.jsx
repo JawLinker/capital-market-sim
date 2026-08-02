@@ -26,13 +26,13 @@ function DimensionCard({ name, data }) {
     <div className="panel p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{name}</p>
-          <p className="mt-1 text-sm font-semibold text-slate-100">{data?.label || "—"}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-parch-600">{name}</p>
+          <p className="mt-1 text-sm font-semibold text-parch-100">{data?.label || "—"}</p>
         </div>
-        <span className="text-xl font-bold tabular text-slate-100">{score}</span>
+        <span className="text-xl font-bold tabular text-parch-100">{score}</span>
       </div>
       <ProgressBar value={score / 100} className="mt-3" color={score >= 70 ? "#22c55e" : score >= 45 ? "#f59e0b" : "#ef4444"} />
-      <p className="mt-3 text-xs leading-5 text-slate-400">{data?.detail || t("advisor.dimEmpty")}</p>
+      <p className="mt-3 text-xs leading-5 text-parch-500">{data?.detail || t("advisor.dimEmpty")}</p>
     </div>
   );
 }
@@ -55,11 +55,11 @@ export default function AdvisorView() {
           <div className="flex items-center gap-4">
             <ScoreRing score={advisor?.health_score || 0} label="Health" size={104} />
             <div>
-              <p className="flex items-center gap-2 text-sm font-semibold text-slate-100">
+              <p className="flex items-center gap-2 text-sm font-semibold text-parch-100">
                 <Sparkles size={15} className="text-violet-400" />
                 {t("advisor.healthReport")}
               </p>
-              <p className="mt-1 max-w-md text-xs leading-5 text-slate-400">
+              <p className="mt-1 max-w-md text-xs leading-5 text-parch-500">
                 {t("advisor.healthDetail")}
               </p>
             </div>
@@ -71,8 +71,8 @@ export default function AdvisorView() {
               [t("advisor.return"), percent(summary?.total_return_pct)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-md border border-ink-600/70 bg-ink-750 px-3 py-2 text-center">
-                <p className="text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
-                <p className="mt-0.5 text-sm font-semibold tabular text-slate-100">{value}</p>
+                <p className="text-[10px] uppercase tracking-wide text-parch-600">{label}</p>
+                <p className="mt-0.5 text-sm font-semibold tabular text-parch-100">{value}</p>
               </div>
             ))}
           </div>
@@ -106,16 +106,16 @@ export default function AdvisorView() {
                   {advisor.holdings.map((item) => (
                     <tr key={item.ticker} className="hover:bg-ink-700/40">
                       <td className="td">
-                        <span className="block font-semibold text-slate-100">{item.name}</span>
-                        <span className="block text-[11px] text-slate-500">
+                        <span className="block font-semibold text-parch-100">{item.name}</span>
+                        <span className="block text-[11px] text-parch-600">
                           {t(`industry.${item.industry}`)}
                         </span>
                       </td>
-                      <td className="td text-slate-300">{item.weight.toFixed(1)}%</td>
+                      <td className="td text-parch-300">{item.weight.toFixed(1)}%</td>
                       {["valuation", "momentum", "risk"].map((key) => (
                         <td key={key} className="td">
                           <div className="flex items-center gap-2">
-                            <span className="w-6 font-semibold tabular text-slate-200">
+                            <span className="w-6 font-semibold tabular text-parch-200">
                               {item.dimensions[key].score}
                             </span>
                             <ProgressBar
@@ -159,8 +159,8 @@ export default function AdvisorView() {
         </section>
 
         <section className="panel p-5">
-          <h3 className="text-sm font-semibold text-slate-100">{t("advisor.howToRead")}</h3>
-          <ul className="mt-3 grid grid-cols-1 gap-3 text-xs leading-5 text-slate-400 md:grid-cols-2">
+          <h3 className="text-sm font-semibold text-parch-100">{t("advisor.howToRead")}</h3>
+          <ul className="mt-3 grid grid-cols-1 gap-3 text-xs leading-5 text-parch-500 md:grid-cols-2">
             {(advisor?.education || []).map((item, index) => (
               <li key={index} className="rounded-md border border-ink-600/60 bg-ink-750/60 px-3 py-2.5">
                 {item}
@@ -172,13 +172,13 @@ export default function AdvisorView() {
 
       <section className="panel flex h-[560px] min-h-0 flex-col xl:sticky xl:top-5 xl:h-[calc(100vh-104px)]">
         <div className="panel-header">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-100">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-parch-100">
             <Bot size={16} className="text-violet-400" /> {t("advisor.aiTitle")}
           </h3>
           <Badge className="border-violet-400/30 bg-violet-400/10 text-violet-300">{t("advisor.localEngine")}</Badge>
         </div>
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-          <div className="rounded-md border border-ink-600/60 bg-ink-750/70 px-3 py-2.5 text-xs leading-5 text-slate-300">
+          <div className="rounded-md border border-ink-600/60 bg-ink-750/70 px-3 py-2.5 text-xs leading-5 text-parch-300">
             {t("advisor.intro")}
           </div>
           {chatMessages.map((chat, index) => (
@@ -187,7 +187,7 @@ export default function AdvisorView() {
               className={`max-w-[92%] rounded-md border px-3 py-2.5 text-xs leading-5 ${
                 chat.role === "user"
                   ? "ml-auto border-sky/30 bg-sky/10 text-sky-100"
-                  : "border-ink-600/60 bg-ink-750 text-slate-300"
+                  : "border-ink-600/60 bg-ink-750 text-parch-300"
               }`}
             >
               {chat.content}
@@ -200,7 +200,7 @@ export default function AdvisorView() {
               <button
                 key={suggestionKey}
                 onClick={() => submit(t(suggestionKey))}
-                className="rounded-full border border-ink-500/50 px-2.5 py-1 text-[11px] text-slate-400 transition-colors hover:border-sky/40 hover:text-sky"
+                className="rounded-full border border-ink-500/50 px-2.5 py-1 text-[11px] text-parch-500 transition-colors hover:border-sky/40 hover:text-sky"
               >
                 {t(suggestionKey)}
               </button>

@@ -1,10 +1,18 @@
-import { ArrowDownCircle, ArrowUpCircle, Banknote, Briefcase, PieChart } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Banknote, Briefcase, PieChart, ScrollText } from "lucide-react";
 
 import { useApp } from "../../store/AppContext.jsx";
 import { industryColor, money, percent, toneClass } from "../../utils/format.js";
 import LineChart from "../charts/LineChart.jsx";
 import DonutChart from "../charts/DonutChart.jsx";
+import { MuseumHeader } from "../museum.jsx";
 import { Badge, Change, EmptyState, SectionTitle, StatCard } from "../ui.jsx";
+
+function lessonFor(trade, t) {
+  if (trade.action === "buy") return t("journal.lessonBuy");
+  if (trade.realized_pnl > 0) return t("journal.lessonProfit");
+  if (trade.realized_pnl < 0) return t("journal.lessonLoss");
+  return t("journal.lessonFlat");
+}
 
 export default function PortfolioView() {
   const { portfolio, selectTicker, t } = useApp();
@@ -17,11 +25,17 @@ export default function PortfolioView() {
       date: point.date,
       value: point.value,
     })) || [];
-
+  const journalEntries = [...transactions].reverse();
   const unrealizedTotal = holdings.reduce((sum, item) => sum + item.unrealized_pnl, 0);
 
   return (
     <div className="space-y-4 p-4 lg:p-5">
+      <MuseumHeader
+        kicker={t("journal.kicker")}
+        title={t("journal.title")}
+        detail={t("journal.detail")}
+      />
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label={t("portfolio.statValue")} value={money(summary?.value)} icon={<Briefcase size={17} />} />
         <StatCard label={t("portfolio.statCash")} value={money(summary?.cash)} icon={<Banknote size={17} />} />
@@ -45,7 +59,7 @@ export default function PortfolioView() {
           <SectionTitle title={t("portfolio.equityTitle")} detail={t("portfolio.equityDetail")} />
           <div className="p-3">
             {performanceSeries.length > 1 ? (
-              <LineChart data={performanceSeries} height={280} color="#38bdf8" baseline={100000} />
+              <LineChart data={performanceSeries} height={280} color="#b08d57" baseline={100000} />
             ) : (
               <EmptyState
                 title={t("portfolio.equityEmpty")}
@@ -72,8 +86,8 @@ export default function PortfolioView() {
                         className="h-2 w-2 shrink-0 rounded-full"
                         style={{ backgroundColor: industryColor(item.industry) }}
                       />
-                      <span className="flex-1 text-slate-300">{t(`industry.${item.industry}`)}</span>
-                      <span className="w-12 text-right font-semibold tabular text-slate-200">
+                      <span className="flex-1 text-parch-300">{t(`industry.${item.industry}`)}</span>
+                      <span className="w-12 text-right font-semibold tabular text-parch-200">
                         {item.weight.toFixed(1)}%
                       </span>
                     </li>
@@ -88,10 +102,7 @@ export default function PortfolioView() {
       </div>
 
       <section className="panel overflow-hidden">
-        <SectionTitle
-          title={t("portfolio.holdingsTitle")}
-          detail={t("portfolio.holdingsDetail")}
-        />
+        <SectionTitle title={t("portfolio.holdingsTitle")} detail={t("portfolio.holdingsDetail")} />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] border-collapse">
             <thead>
@@ -112,21 +123,23 @@ export default function PortfolioView() {
               {holdings.map((holding) => (
                 <tr key={holding.ticker} className="row-hover" onClick={() => selectTicker(holding.ticker)}>
                   <td className="td">
-                    <span className="font-semibold text-slate-100">{holding.name}</span>
+                    <span className="font-semibold text-parch-100">{holding.name}</span>
                   </td>
-                  <td className="td text-slate-400">{t(`industry.${holding.industry}`)}</td>
-                  <td className="td text-slate-300">{holding.shares.toFixed(4)}</td>
-                  <td className="td text-slate-300">{money(holding.avg_cost)}</td>
-                  <td className="td font-semibold text-slate-100">{money(holding.price)}</td>
-                  <td className="td font-semibold text-slate-100">{money(holding.market_value)}</td>
+                  <td className="td text-parch-500">{t(`industry.${holding.industry}`)}</td>
+                  <td className="td text-parch-300">{holding.shares.toFixed(4)}</td>
+                  <td className="td text-parch-300">{money(holding.avg_cost)}</td>
+                  <td className="td font-semibold text-parch-100">{money(holding.price)}</td>
+                  <td className="td font-semibold text-parch-100">{money(holding.market_value)}</td>
                   <td className="td">
                     <span className={`${toneClass(holding.unrealized_pnl)}`}>
                       {money(holding.unrealized_pnl)}
                       <span className="ml-1 text-[11px]">({percent(holding.unrealized_pct)})</span>
                     </span>
                   </td>
-                  <td className="td"><Change value={holding.day_change_pct} /></td>
-                  <td className="td text-slate-300">{holding.weight.toFixed(1)}%</td>
+                  <td className="td">
+                    <Change value={holding.day_change_pct} />
+                  </td>
+                  <td className="td text-parch-300">{holding.weight.toFixed(1)}%</td>
                   <td className="td">
                     <div className="flex gap-1" onClick={(event) => event.stopPropagation()}>
                       <button
@@ -151,55 +164,58 @@ export default function PortfolioView() {
         </div>
       </section>
 
-      <section className="panel overflow-hidden">
-        <SectionTitle title={t("portfolio.txTitle")} detail={t("portfolio.txDetail")} />
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[820px] border-collapse">
-            <thead>
-              <tr>
-                <th className="th">{t("portfolio.colTxDay")}</th>
-                <th className="th">{t("portfolio.colTxSymbol")}</th>
-                <th className="th">{t("portfolio.colTxAction")}</th>
-                <th className="th">{t("portfolio.colTxShares")}</th>
-                <th className="th">{t("portfolio.colTxPrice")}</th>
-                <th className="th">{t("portfolio.colTxGross")}</th>
-                <th className="th">{t("portfolio.colTxFee")}</th>
-                <th className="th">{t("portfolio.colTxTax")}</th>
-                <th className="th">{t("portfolio.colTxRealized")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((trade) => (
-                <tr key={trade.id} className="hover:bg-ink-700/40">
-                  <td className="td text-slate-500">{trade.day}</td>
-                  <td className="td font-semibold text-slate-200">{trade.name || trade.ticker}</td>
-                  <td className="td">
+      <section>
+        <div className="mb-3 flex items-center gap-2">
+          <ScrollText size={16} className="text-brass" />
+          <h2 className="font-display text-lg font-bold text-parch-100">{t("journal.entries")}</h2>
+        </div>
+        {journalEntries.length > 0 ? (
+          <div className="space-y-3">
+            {journalEntries.map((trade) => (
+              <article key={trade.id} className="paper-panel px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
                     <Badge
                       className={
                         trade.action === "buy"
-                          ? "border-mint/40 bg-mint/10 text-mint"
+                          ? "border-ink-900/30 bg-ink-900/10 text-ink-900"
                           : "border-risk/40 bg-risk/10 text-risk"
                       }
                     >
                       {t(trade.action === "buy" ? "order.buy" : "order.sell")}
                     </Badge>
-                  </td>
-                  <td className="td text-slate-300">{trade.shares.toFixed(4)}</td>
-                  <td className="td text-slate-300">{money(trade.price)}</td>
-                  <td className="td text-slate-300">{money(trade.gross)}</td>
-                  <td className="td text-slate-400">{money(trade.fee)}</td>
-                  <td className="td text-slate-400">{money(trade.stamp_tax)}</td>
-                  <td className={`td ${toneClass(trade.realized_pnl)}`}>
-                    {trade.realized_pnl ? `${trade.realized_pnl > 0 ? "+" : ""}${money(trade.realized_pnl)}` : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {transactions.length === 0 ? (
-            <EmptyState title={t("portfolio.txEmpty")} detail={t("portfolio.txEmptyDetail")} />
-          ) : null}
-        </div>
+                    <h3 className="font-display text-sm font-bold text-ink-950">
+                      {trade.name || trade.ticker}
+                    </h3>
+                  </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-900/60">
+                    {t("journal.tradingDay", { day: trade.day })}
+                  </p>
+                </div>
+                <p className="mt-1.5 text-xs leading-5 text-ink-900/75">
+                  {trade.shares.toFixed(4)} @ {money(trade.price)} · {t("portfolio.colTxGross")}{" "}
+                  {money(trade.gross)}
+                  {trade.realized_pnl ? (
+                    <>
+                      {" "}· {t("portfolio.colTxRealized")}{" "}
+                      <span className={trade.realized_pnl >= 0 ? "font-semibold text-ink-900" : "font-semibold text-risk"}>
+                        {trade.realized_pnl > 0 ? "+" : ""}
+                        {money(trade.realized_pnl)}
+                      </span>
+                    </>
+                  ) : null}
+                </p>
+                <p className="mt-2 border-t border-ink-900/15 pt-2 text-xs italic leading-5 text-ink-900/80">
+                  {lessonFor(trade, t)}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <section className="panel">
+            <EmptyState title={t("journal.empty")} detail={t("journal.emptyDetail")} />
+          </section>
+        )}
       </section>
     </div>
   );

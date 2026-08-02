@@ -22,7 +22,7 @@ export default function App() {
   if (!authChecked) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-slate-400">{t("loading.init")}</p>
+        <p className="text-sm text-parch-500">{t("loading.init")}</p>
       </div>
     );
   }

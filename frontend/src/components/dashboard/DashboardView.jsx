@@ -4,16 +4,26 @@ import {
   ArrowUpRight,
   Banknote,
   Briefcase,
+  FileText,
   Newspaper,
+  ScrollText,
   TrendingUp,
   Wallet,
 } from "lucide-react";
 
 import { useApp } from "../../store/AppContext.jsx";
-import { industryColor, money, percent, toneClass } from "../../utils/format.js";
+import { eraForDate, playableEras } from "../../utils/era.js";
+import { money, percent } from "../../utils/format.js";
 import LineChart from "../charts/LineChart.jsx";
-import DonutChart from "../charts/DonutChart.jsx";
+import { ArchiveCard, EraBadge, MuseumHeader, TimelineNavigator } from "../museum.jsx";
 import { Badge, Change, EmptyState, SectionTitle, StatCard } from "../ui.jsx";
+
+const CYCLE_ACTION = {
+  recovery: "home.actionRecovery",
+  bull: "home.actionBull",
+  bear: "home.actionBear",
+  recession: "home.actionRecession",
+};
 
 export default function DashboardView() {
   const {
@@ -25,6 +35,7 @@ export default function DashboardView() {
     selectTicker,
     playerActivity,
     t,
+    lang,
   } = useApp();
   const summary = portfolio?.summary;
   const market = gameState?.market;
@@ -32,189 +43,242 @@ export default function DashboardView() {
     () => Object.fromEntries(stocks.map((stock) => [stock.ticker, stock])),
     [stocks]
   );
-
+  const era = eraForDate(market?.date, lang);
+  const eras = playableEras(lang);
+  const cycleLabel = t(`cycle.${market?.market_cycle}`);
+  const recentNews = (news || []).slice(-8).reverse();
+  const allocationBreakdown = portfolio?.allocation?.breakdown || [];
   const performanceSeries =
     portfolio?.performance?.series.map((point) => ({
       date: point.date,
       value: point.value,
     })) || [];
 
-  const allocationBreakdown = portfolio?.allocation?.breakdown || [];
-  const transactions = portfolio?.transactions || [];
-  const recentNews = (news || []).slice(-6).reverse();
-
   return (
     <div className="space-y-4 p-4 lg:p-5">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label={t("dashboard.portfolioValue")}
-          value={money(summary?.value)}
-          sub={t("dashboard.invested", {
-            value: summary?.invested !== undefined ? money(summary.invested) : "—",
-          })}
-          icon={<Wallet size={17} />}
-        />
-        <StatCard
-          label={t("dashboard.cashBalance")}
-          value={money(summary?.cash)}
-          sub={t("dashboard.ofTotal", {
-            pct: percent((summary?.cash / summary?.value) * 100, 1, false),
-          })}
-          icon={<Banknote size={17} />}
-        />
-        <StatCard
-          label={t("dashboard.dailyPnl")}
-          value={money(summary?.daily_pnl)}
-          sub={<Change value={summary?.day_change_pct} />}
-          tone={summary?.daily_pnl >= 0 ? "positive" : "negative"}
-          icon={<TrendingUp size={17} />}
-        />
-        <StatCard
-          label={t("dashboard.totalReturn")}
-          value={percent(summary?.total_return_pct)}
-          sub={t("dashboard.sinceStart", { value: money(summary?.profit) })}
-          tone={summary?.total_return_pct >= 0 ? "positive" : "negative"}
-          icon={<Briefcase size={17} />}
-        />
-      </div>
+      <MuseumHeader
+        kicker={t("home.kicker")}
+        title={`${era.label} · ${cycleLabel}`}
+        detail={t("home.detail", { date: market?.date || "…", day: market?.day || 0 })}
+        right={<EraBadge>{era.label}</EraBadge>}
+      />
+
+      <TimelineNavigator eras={eras} current={era.key} />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <section className="panel xl:col-span-2">
-          <SectionTitle
-            title={t("dashboard.performanceTitle")}
-            detail={t("dashboard.performanceDetail")}
-            right={<Badge className="border-ink-500/60 text-slate-400">{t("dashboard.vsStart")}</Badge>}
-          />
-          <div className="p-3">
-            {performanceSeries.length > 1 ? (
-              <LineChart data={performanceSeries} height={290} color="#22c55e" baseline={100000} />
-            ) : (
-              <EmptyState
-                title={t("dashboard.performanceEmpty")}
-                detail={t("dashboard.performanceEmptyDetail")}
-              />
-            )}
-          </div>
-        </section>
+        <ArchiveCard
+          className="xl:col-span-2"
+          stamp={t("home.stamp")}
+          header={
+            <div>
+              <h2 className="flex items-center gap-2 font-display text-[15px] font-semibold text-parch-100">
+                <Newspaper size={15} className="text-brass" />
+                {t("home.events")}
+              </h2>
+              <p className="mt-0.5 text-xs text-parch-500">{t("home.eventsDetail")}</p>
+            </div>
+          }
+        >
+          {recentNews.length > 0 ? (
+            <ul className="space-y-2">
+              {recentNews.map((event) => (
+                <li
+                  key={event.id}
+                  className="flex gap-3 rounded-[3px] border border-ink-600/60 bg-ink-900/50 px-3 py-2.5"
+                >
+                  <span
+                    className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                      event.category === "positive"
+                        ? "bg-mint"
+                        : event.category === "negative"
+                          ? "bg-risk"
+                          : "bg-brass"
+                    }`}
+                  />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-xs font-semibold text-parch-100">{event.headline}</p>
+                      {event.company ? (
+                        <Badge className="border-brass/40 bg-brass/10 text-brass">
+                          {event.company}
+                        </Badge>
+                      ) : null}
+                    </div>
+                    {event.summary ? (
+                      <p className="mt-1 text-[11px] leading-5 text-parch-500">{event.summary}</p>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState
+              title={t("home.eventsEmpty")}
+              detail={t("home.eventsEmptyDetail")}
+            />
+          )}
+        </ArchiveCard>
 
-        <section className="panel">
-          <SectionTitle title={t("dashboard.allocationTitle")} detail={t("dashboard.allocationDetail")} />
-          <div className="flex flex-col items-center gap-4 p-4">
-            {allocationBreakdown.length > 0 ? (
-              <>
-                <DonutChart
-                  data={allocationBreakdown}
-                  centerTitle={t("dashboard.investedLabel")}
-                  centerValue={money(portfolio?.allocation?.total_invested, 0)}
+        <div className="space-y-4">
+          <ArchiveCard
+            stamp={t("home.indicatorsStamp")}
+            header={
+              <h2 className="font-display text-[15px] font-semibold text-parch-100">
+                {t("home.indicators")}
+              </h2>
+            }
+          >
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                [t("topbar.rate"), `${market?.policy_rate?.toFixed(2) ?? "…"}%`],
+                [t("topbar.sentiment"), market?.sentiment?.toFixed(2) ?? "…"],
+                [t("home.inflation"), `${market?.inflation?.toFixed(2) ?? "…"}%`],
+                [t("topbar.benchmark"), market ? money(market.benchmark_value, 0) : "…"],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-[3px] border border-ink-600/60 bg-ink-900/50 px-3 py-2.5"
+                >
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-parch-500">{label}</p>
+                  <p className="mt-1 font-display text-sm font-bold tabular text-parch-100">{value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3">
+              <div className="mb-1 flex justify-between text-[10px] text-parch-500">
+                <span>{t("home.sentimentScale")}</span>
+                <span className="tabular text-parch-300">
+                  {market ? Math.round(((market.sentiment - 0.55) / 0.95) * 100) : 0}%
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-ink-600">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-risk via-gold to-mint"
+                  style={{
+                    width: `${market ? Math.round(((market.sentiment - 0.55) / 0.95) * 100) : 0}%`,
+                  }}
                 />
-                <ul className="w-full space-y-1.5">
-                  {allocationBreakdown.map((item) => (
-                    <li key={item.industry} className="flex items-center gap-2 text-xs">
-                      <span
-                        className="h-2 w-2 shrink-0 rounded-full"
-                        style={{ backgroundColor: industryColor(item.industry) }}
-                      />
-                      <span className="flex-1 text-slate-300">{t(`industry.${item.industry}`)}</span>
-                      <span className="tabular text-slate-400">{money(item.value, 0)}</span>
-                      <span className="w-10 text-right font-semibold tabular text-slate-200">
-                        {item.weight.toFixed(1)}%
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <EmptyState
-                title={t("dashboard.allocationEmpty")}
-                detail={t("dashboard.allocationEmptyDetail")}
-              />
-            )}
-          </div>
-        </section>
+              </div>
+            </div>
+          </ArchiveCard>
+
+          <ArchiveCard
+            header={
+              <h2 className="flex items-center gap-2 font-display text-[15px] font-semibold text-parch-100">
+                <FileText size={15} className="text-brass" />
+                {t("home.actions")}
+              </h2>
+            }
+          >
+            <p className="text-sm leading-6 text-parch-400">{t(CYCLE_ACTION[market?.market_cycle] || CYCLE_ACTION.recovery)}</p>
+            <div className="museum-rule my-3" />
+            <p className="text-[11px] leading-5 text-parch-600">{t("home.actionsDetail")}</p>
+          </ArchiveCard>
+        </div>
       </div>
 
-      <section className="panel">
+      <section className="panel overflow-hidden">
         <SectionTitle
-          title={t("dashboard.indexTitle")}
-          detail={t("dashboard.indexDetail")}
+          title={t("home.journey")}
+          detail={t("home.journeyDetail")}
           right={
-            <Badge className="border-gold/40 bg-gold/10 text-gold">
-              {market?.shanghai_index?.toFixed(2)}
+            <Badge className="border-brass/40 bg-brass/10 text-brass">
+              {t("dashboard.vsStart")}
             </Badge>
           }
         />
-        <div className="p-3">
-          {indexHistory.length > 1 ? (
-            <LineChart
-              data={indexHistory.map((point) => ({ date: point.date, value: point.close }))}
-              height={210}
-              color="#f59e0b"
+        <div className="space-y-4 p-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              label={t("dashboard.portfolioValue")}
+              value={money(summary?.value)}
+              sub={t("dashboard.invested", {
+                value: summary?.invested !== undefined ? money(summary.invested) : "…",
+              })}
+              icon={<Wallet size={17} />}
             />
-          ) : (
-            <EmptyState
-              title={t("dashboard.performanceEmpty")}
-              detail={t("dashboard.performanceEmptyDetail")}
+            <StatCard
+              label={t("dashboard.cashBalance")}
+              value={money(summary?.cash)}
+              sub={t("dashboard.ofTotal", {
+                pct: percent((summary?.cash / summary?.value) * 100, 1, false),
+              })}
+              icon={<Banknote size={17} />}
             />
-          )}
+            <StatCard
+              label={t("dashboard.dailyPnl")}
+              value={money(summary?.daily_pnl)}
+              sub={<Change value={summary?.day_change_pct} />}
+              tone={summary?.daily_pnl >= 0 ? "positive" : "negative"}
+              icon={<TrendingUp size={17} />}
+            />
+            <StatCard
+              label={t("dashboard.totalReturn")}
+              value={percent(summary?.total_return_pct)}
+              sub={t("dashboard.sinceStart", { value: money(summary?.profit) })}
+              tone={summary?.total_return_pct >= 0 ? "positive" : "negative"}
+              icon={<Briefcase size={17} />}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+            <section className="panel xl:col-span-2">
+              <SectionTitle
+                title={t("dashboard.performanceTitle")}
+                detail={t("dashboard.performanceDetail")}
+              />
+              <div className="p-3">
+                {performanceSeries.length > 1 ? (
+                  <LineChart
+                    data={performanceSeries}
+                    height={280}
+                    color="#b08d57"
+                    baseline={100000}
+                  />
+                ) : (
+                  <EmptyState
+                    title={t("dashboard.performanceEmpty")}
+                    detail={t("dashboard.performanceEmptyDetail")}
+                  />
+                )}
+              </div>
+            </section>
+
+            <section className="panel">
+              <SectionTitle
+                title={t("dashboard.indexTitle")}
+                detail={t("dashboard.indexDetail")}
+                right={
+                  <Badge className="border-brass/40 bg-brass/10 text-brass">
+                    {market?.shanghai_index?.toFixed(2)}
+                  </Badge>
+                }
+              />
+              <div className="p-3">
+                {indexHistory.length > 1 ? (
+                  <LineChart
+                    data={indexHistory.map((point) => ({ date: point.date, value: point.close }))}
+                    height={240}
+                    color="#c9a24b"
+                  />
+                ) : (
+                  <EmptyState
+                    title={t("dashboard.performanceEmpty")}
+                    detail={t("dashboard.performanceEmptyDetail")}
+                  />
+                )}
+              </div>
+            </section>
+          </div>
         </div>
       </section>
 
-      <section className="panel">
-        <SectionTitle
-          title={t("dashboard.playerActivityTitle")}
-          detail={t("dashboard.playerActivityDetail")}
-        />
-        {playerActivity.length > 0 ? (
-          <ul className="grid grid-cols-1 gap-px bg-ink-600/60 sm:grid-cols-2 xl:grid-cols-3">
-            {playerActivity.slice(0, 12).map((trade) => (
-              <li key={trade.id} className="flex items-center justify-between gap-2 bg-ink-800 px-4 py-2.5">
-                <div className="min-w-0">
-                  <p className="flex items-center gap-2 text-xs font-semibold text-slate-200">
-                    <span className="truncate">{trade.player}</span>
-                    {trade.is_current ? (
-                      <Badge className="border-sky/40 bg-sky/10 text-sky">
-                        {t("achievements.you")}
-                      </Badge>
-                    ) : null}
-                    <Badge
-                      className={
-                        trade.action === "buy"
-                          ? "border-mint/40 bg-mint/10 text-mint"
-                          : "border-risk/40 bg-risk/10 text-risk"
-                      }
-                    >
-                      {t(trade.action === "buy" ? "order.buy" : "order.sell")}
-                    </Badge>
-                  </p>
-                  <p className="mt-0.5 truncate text-[11px] text-slate-500">
-                    {trade.name} {trade.shares.toFixed(4)} @ {money(trade.price)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs font-semibold tabular text-slate-200">{money(trade.gross)}</p>
-                  <p className="text-[11px] text-slate-500">
-                    {t("dashboard.day", { day: trade.day })}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="p-4">
-            <EmptyState
-              title={t("dashboard.playerActivityEmpty")}
-              detail={t("dashboard.playerActivityEmptyDetail")}
-            />
-          </div>
-        )}
-      </section>
-
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <section className="panel">
+        <section className="panel lg:col-span-2">
           <SectionTitle title={t("dashboard.moversTitle")} detail={t("dashboard.moversDetail")} />
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2">
             <div>
-              <p className="flex items-center gap-1 border-b border-ink-600/60 px-3 py-2 text-[11px] font-semibold uppercase text-mint">
+              <p className="flex items-center gap-1 border-b border-ink-600/60 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-mint">
                 <ArrowUpRight size={13} /> {t("dashboard.gainers")}
               </p>
               <ul>
@@ -225,22 +289,24 @@ export default function DashboardView() {
                       className="row-hover flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
                     >
                       <span className="min-w-0">
-                        <span className="block truncate text-xs font-semibold text-slate-200">
+                        <span className="block truncate text-xs font-semibold text-parch-200">
                           {stock.name}
                         </span>
-                        <span className="block text-[11px] text-slate-500">
+                        <span className="block text-[11px] text-parch-500">
                           {t(`industry.${stockMap[stock.ticker]?.industry}`)}
                         </span>
                       </span>
-                      <span className="text-xs tabular text-slate-300">{money(stock.price)}</span>
-                      <span className="w-14 text-right"><Change value={stock.change_pct} /></span>
+                      <span className="text-xs tabular text-parch-300">{money(stock.price)}</span>
+                      <span className="w-14 text-right">
+                        <Change value={stock.change_pct} />
+                      </span>
                     </button>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <p className="flex items-center gap-1 border-b border-ink-600/60 px-3 py-2 text-[11px] font-semibold uppercase text-risk">
+              <p className="flex items-center gap-1 border-b border-ink-600/60 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-risk">
                 <ArrowDownRight size={13} /> {t("dashboard.losers")}
               </p>
               <ul>
@@ -251,15 +317,17 @@ export default function DashboardView() {
                       className="row-hover flex w-full items-center justify-between gap-2 px-3 py-2 text-left"
                     >
                       <span className="min-w-0">
-                        <span className="block truncate text-xs font-semibold text-slate-200">
+                        <span className="block truncate text-xs font-semibold text-parch-200">
                           {stock.name}
                         </span>
-                        <span className="block text-[11px] text-slate-500">
+                        <span className="block text-[11px] text-parch-500">
                           {t(`industry.${stockMap[stock.ticker]?.industry}`)}
                         </span>
                       </span>
-                      <span className="text-xs tabular text-slate-300">{money(stock.price)}</span>
-                      <span className="w-14 text-right"><Change value={stock.change_pct} /></span>
+                      <span className="text-xs tabular text-parch-300">{money(stock.price)}</span>
+                      <span className="w-14 text-right">
+                        <Change value={stock.change_pct} />
+                      </span>
                     </button>
                   </li>
                 ))}
@@ -269,14 +337,18 @@ export default function DashboardView() {
         </section>
 
         <section className="panel">
-          <SectionTitle title={t("dashboard.recentTrades")} />
-          {transactions.length > 0 ? (
-            <ul className="max-h-64 divide-y divide-ink-600/50 overflow-y-auto">
-              {transactions.slice(0, 8).map((trade) => (
-                <li key={trade.id} className="flex items-center justify-between gap-2 px-4 py-2.5">
+          <SectionTitle
+            title={t("dashboard.playerActivityTitle")}
+            detail={t("dashboard.playerActivityDetail")}
+          />
+          {playerActivity.length > 0 ? (
+            <ul className="grid grid-cols-1 gap-px bg-ink-600/60">
+              {playerActivity.slice(0, 12).map((trade) => (
+                <li key={trade.id} className="flex items-center justify-between gap-2 bg-ink-800 px-4 py-2.5">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-2 text-xs font-semibold text-slate-200">
-                      {trade.name || trade.ticker}
+                    <p className="flex items-center gap-2 text-xs font-semibold text-parch-200">
+                      <ScrollText size={13} className="text-brass" />
+                      <span className="truncate">{trade.player}</span>
                       <Badge
                         className={
                           trade.action === "buy"
@@ -287,53 +359,26 @@ export default function DashboardView() {
                         {t(trade.action === "buy" ? "order.buy" : "order.sell")}
                       </Badge>
                     </p>
-                    <p className="mt-0.5 truncate text-[11px] text-slate-500">
-                      {trade.shares.toFixed(4)} @ {money(trade.price)}
+                    <p className="mt-0.5 truncate text-[11px] text-parch-500">
+                      {trade.name} {trade.shares.toFixed(4)} @ {money(trade.price)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={`text-xs font-semibold tabular ${toneClass(trade.realized_pnl)}`}>
-                      {trade.realized_pnl !== 0 ? `${trade.realized_pnl > 0 ? "+" : ""}${money(trade.realized_pnl)}` : "—"}
+                    <p className="text-xs font-semibold tabular text-parch-200">{money(trade.gross)}</p>
+                    <p className="text-[11px] text-parch-500">
+                      {t("dashboard.day", { day: trade.day })}
                     </p>
-                    <p className="text-[11px] text-slate-500">{t("dashboard.day", { day: trade.day })}</p>
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <EmptyState title={t("dashboard.noTrades")} detail={t("dashboard.noTradesDetail")} />
-          )}
-        </section>
-
-        <section className="panel">
-          <SectionTitle title={t("dashboard.newsTitle")} detail={t("dashboard.newsDetail")} right={<Newspaper size={15} className="text-slate-500" />} />
-          {recentNews.length > 0 ? (
-            <ul className="max-h-64 divide-y divide-ink-600/50 overflow-y-auto">
-              {recentNews.map((event) => (
-                <li key={event.id} className="px-4 py-2.5">
-                  <div className="flex items-start gap-2">
-                    <Badge
-                      className={
-                        event.category === "positive"
-                          ? "border-mint/40 bg-mint/10 text-mint"
-                          : event.category === "negative"
-                            ? "border-risk/40 bg-risk/10 text-risk"
-                            : "border-slate-500/40 bg-slate-500/10 text-slate-300"
-                      }
-                    >
-                      {t(`news.${event.category}`)}
-                    </Badge>
-                    <p className="text-xs font-medium leading-4 text-slate-200">{event.headline}</p>
-                  </div>
-                  <p className="mt-1 text-[11px] leading-4 text-slate-500">{event.summary}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptyState
-              title={t("dashboard.quietTape")}
-              detail={t("dashboard.newsEmptyDetail")}
-            />
+            <div className="p-4">
+              <EmptyState
+                title={t("dashboard.playerActivityEmpty")}
+                detail={t("dashboard.playerActivityEmptyDetail")}
+              />
+            </div>
           )}
         </section>
       </div>

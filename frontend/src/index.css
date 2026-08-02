@@ -13,13 +13,18 @@ body,
 }
 
 body {
-  @apply bg-ink-900 text-slate-200 antialiased;
+  @apply bg-ink-900 text-parch-300 antialiased;
   font-feature-settings: "tnum" 1, "cv01" 1;
+  background-image:
+    radial-gradient(ellipse at 50% -20%, rgba(176, 141, 87, 0.1), transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(192, 90, 69, 0.06), transparent 45%),
+    radial-gradient(ellipse at 0% 100%, rgba(127, 157, 181, 0.05), transparent 45%);
+  background-attachment: fixed;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #33465a #0d141c;
+  scrollbar-color: #6b5a3e #120e0a;
 }
 
 *::-webkit-scrollbar {
@@ -28,11 +33,11 @@ body {
 }
 
 *::-webkit-scrollbar-track {
-  background: #0d141c;
+  background: #120e0a;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #33465a;
+  background: #6b5a3e;
   border-radius: 8px;
 }
 
@@ -41,41 +46,53 @@ body {
 }
 
 .panel {
-  @apply rounded-lg border border-ink-600/80 bg-ink-800 shadow-panel;
+  @apply rounded-[3px] border border-ink-600/80 bg-ink-800/95 shadow-panel;
 }
 
 .panel-header {
-  @apply flex items-center justify-between border-b border-ink-600/70 px-4 py-3;
+  @apply flex items-center justify-between border-b border-ink-600/70 bg-ink-850/70 px-4 py-3;
+}
+
+.paper-panel {
+  @apply rounded-[3px] border border-parch-600/50 bg-parch-300 text-ink-950 shadow-paper;
+  background-image:
+    radial-gradient(ellipse at 15% 0%, rgba(255, 255, 255, 0.5), transparent 45%),
+    radial-gradient(ellipse at 85% 100%, rgba(143, 122, 82, 0.22), transparent 55%);
+}
+
+.museum-rule {
+  @apply h-px w-full;
+  background: linear-gradient(90deg, transparent, rgba(176, 141, 87, 0.55), transparent);
 }
 
 .btn {
-  @apply inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40;
+  @apply inline-flex items-center justify-center gap-1.5 rounded-[3px] border px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40;
 }
 
 .btn-primary {
-  @apply border-transparent bg-mint/90 text-ink-950 hover:bg-mint;
+  @apply border-brass/80 bg-brass text-ink-950 hover:border-parch-400 hover:bg-parch-400;
 }
 
 .btn-danger {
-  @apply border-transparent bg-risk/85 text-white hover:bg-risk;
+  @apply border-risk/80 bg-risk/90 text-parch-100 hover:bg-risk;
 }
 
 .btn-ghost {
-  @apply border-ink-500/60 bg-ink-700/60 text-slate-200 hover:border-ink-500 hover:bg-ink-600;
+  @apply border-parch-600/40 bg-ink-700/50 text-parch-200 hover:border-parch-500 hover:bg-ink-600/70;
 }
 
 .input {
-  @apply w-full rounded-md border border-ink-500/60 bg-ink-900/80 px-3 py-2 text-sm text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-sky-500/70 focus:ring-2 focus:ring-sky-500/20;
+  @apply w-full rounded-[3px] border border-parch-600/40 bg-ink-950/70 px-3 py-2 text-sm text-parch-200 outline-none transition-colors placeholder:text-parch-600 focus:border-brass focus:ring-2 focus:ring-brass/20;
 }
 
 .th {
-  @apply px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500;
+  @apply px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-parch-500;
 }
 
 .td {
-  @apply px-3 py-2.5 text-sm tabular;
+  @apply px-3 py-2.5 text-sm tabular text-parch-300;
 }
 
 .row-hover {
-  @apply cursor-pointer transition-colors hover:bg-ink-700/50;
+  @apply cursor-pointer transition-colors hover:bg-parch-500/10;
 }

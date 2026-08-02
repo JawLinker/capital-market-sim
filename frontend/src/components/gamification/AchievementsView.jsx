@@ -57,8 +57,8 @@ export default function AchievementsView() {
               <Trophy size={22} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-100">{t("achievements.title")}</p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="text-sm font-semibold text-parch-100">{t("achievements.title")}</p>
+              <p className="mt-0.5 text-xs text-parch-600">
                 {t("achievements.subtitle", {
                   unlocked: achievements?.unlocked_count,
                   total: achievements?.total_count,
@@ -89,8 +89,8 @@ export default function AchievementsView() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <Target size={14} className={milestone.reached ? "text-mint" : "text-slate-500"} />
-                    <span className={`text-[11px] font-semibold tabular ${milestone.reached ? "text-mint" : "text-slate-400"}`}>
+                    <Target size={14} className={milestone.reached ? "text-mint" : "text-parch-600"} />
+                    <span className={`text-[11px] font-semibold tabular ${milestone.reached ? "text-mint" : "text-parch-500"}`}>
                       {milestone.label}
                     </span>
                   </div>
@@ -99,7 +99,7 @@ export default function AchievementsView() {
                     className="mt-2"
                     color={milestone.reached ? "#22c55e" : "#38bdf8"}
                   />
-                  <p className="mt-1.5 text-[10px] text-slate-500">
+                  <p className="mt-1.5 text-[10px] text-parch-600">
                     {milestone.reached
                       ? t("achievements.reached")
                       : t("achievements.nextGoal", { pct: Math.round(progress * 100) })}
@@ -131,14 +131,14 @@ export default function AchievementsView() {
                   className={
                     item.unlocked
                       ? "border-mint/40 bg-mint/10 text-mint"
-                      : "border-ink-500/50 text-slate-500"
+                      : "border-ink-500/50 text-parch-600"
                   }
                 >
                   {item.unlocked ? t("achievements.unlocked") : t("achievements.locked")}
                 </Badge>
               </div>
-              <p className="mt-2.5 text-sm font-semibold text-slate-100">{item.title}</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">{item.description}</p>
+              <p className="mt-2.5 text-sm font-semibold text-parch-100">{item.title}</p>
+              <p className="mt-1 text-xs leading-5 text-parch-600">{item.description}</p>
             </div>
           ))}
         </div>
@@ -149,7 +149,7 @@ export default function AchievementsView() {
           title={t("achievements.leaderboard")}
           detail={t("achievements.leaderboardDetail")}
           right={
-            <Badge className="border-ink-500/50 text-slate-300">
+            <Badge className="border-ink-500/50 text-parch-300">
               {t("achievements.winRate", {
                 losses: leaderboard?.losses,
                 flat: leaderboard?.flat,
@@ -184,27 +184,27 @@ export default function AchievementsView() {
                         entry.rank === 1
                           ? "bg-gold/20 text-gold"
                           : entry.rank === 2
-                            ? "bg-slate-400/20 text-slate-200"
+                            ? "bg-slate-400/20 text-parch-200"
                             : entry.rank === 3
                               ? "bg-amber-700/25 text-amber-400"
-                              : "text-slate-500"
+                              : "text-parch-600"
                       }`}
                     >
                       {entry.rank}
                     </span>
                   </td>
                   <td className="td">
-                    <span className="flex items-center gap-2 font-semibold text-slate-100">
+                    <span className="flex items-center gap-2 font-semibold text-parch-100">
                       {entry.name}
                       {entry.kind === "player" && entry.is_current ? (
                         <Badge className="border-sky/40 bg-sky/10 text-sky">{t("achievements.you")}</Badge>
                       ) : entry.kind === "benchmark" ? (
-                        <Badge className="border-ink-500/50 text-slate-400">{t("achievements.index")}</Badge>
+                        <Badge className="border-ink-500/50 text-parch-500">{t("achievements.index")}</Badge>
                       ) : null}
                     </span>
                   </td>
-                  <td className="td text-slate-400">{t(`strategy.${entry.strategy}`)}</td>
-                  <td className="td font-semibold tabular text-slate-100">{money(entry.value)}</td>
+                  <td className="td text-parch-500">{t(`strategy.${entry.strategy}`)}</td>
+                  <td className="td font-semibold tabular text-parch-100">{money(entry.value)}</td>
                   <td className={`td font-semibold tabular ${toneClass(entry.return_pct)}`}>
                     {percent(entry.return_pct)}
                   </td>
@@ -217,7 +217,7 @@ export default function AchievementsView() {
                         {t("leaderboard.history")}
                       </button>
                     ) : (
-                      <span className="text-slate-600">—</span>
+                      <span className="text-parch-700">—</span>
                     )}
                   </td>
                 </tr>
@@ -239,12 +239,12 @@ export default function AchievementsView() {
             <div className="panel-header">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="truncate text-base font-bold text-slate-100">{botData.name}</h3>
+                  <h3 className="truncate text-base font-bold text-parch-100">{botData.name}</h3>
                   <Badge className="border-violet-400/30 bg-violet-400/10 text-violet-300">
                     {t(`strategy.${botData.strategy}`)}
                   </Badge>
                 </div>
-                <p className="mt-0.5 text-xs text-slate-500">{botData.positions} {t("portfolio.positions", { count: botData.positions })}</p>
+                <p className="mt-0.5 text-xs text-parch-600">{botData.positions} {t("portfolio.positions", { count: botData.positions })}</p>
               </div>
               <button
                 onClick={closeBot}
@@ -262,8 +262,8 @@ export default function AchievementsView() {
                 [t("dashboard.totalReturn"), percent(botData.return_pct)],
               ].map(([label, value]) => (
                 <div key={label}>
-                  <p className="text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
-                  <p className={`mt-0.5 truncate text-sm font-semibold tabular ${label === t("dashboard.totalReturn") ? toneClass(botData.return_pct) : "text-slate-100"}`}>
+                  <p className="text-[10px] uppercase tracking-wide text-parch-600">{label}</p>
+                  <p className={`mt-0.5 truncate text-sm font-semibold tabular ${label === t("dashboard.totalReturn") ? toneClass(botData.return_pct) : "text-parch-100"}`}>
                     {value}
                   </p>
                 </div>
@@ -271,17 +271,17 @@ export default function AchievementsView() {
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto">
               <div className="border-b border-ink-600/60 p-3">
-                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-parch-500">
                   {t("history.equity")}
                 </h4>
                 {equityData.length > 1 ? (
                   <LineChart data={equityData} height={200} color="#38bdf8" />
                 ) : (
-                  <p className="px-3 py-6 text-center text-xs text-slate-500">{t("history.noHistory")}</p>
+                  <p className="px-3 py-6 text-center text-xs text-parch-600">{t("history.noHistory")}</p>
                 )}
               </div>
               <div className="p-4">
-                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-parch-500">
                   {t("history.trades")}
                 </h4>
                 {botData.trades.length > 0 ? (
@@ -299,8 +299,8 @@ export default function AchievementsView() {
                     <tbody>
                       {botData.trades.map((trade) => (
                         <tr key={trade.id} className="hover:bg-ink-700/40">
-                          <td className="td text-slate-500">{trade.day}</td>
-                          <td className="td font-semibold text-slate-100">{trade.name}</td>
+                          <td className="td text-parch-600">{trade.day}</td>
+                          <td className="td font-semibold text-parch-100">{trade.name}</td>
                           <td className="td">
                             <Badge
                               className={
@@ -312,15 +312,15 @@ export default function AchievementsView() {
                               {t(trade.action === "buy" ? "order.buy" : "order.sell")}
                             </Badge>
                           </td>
-                          <td className="td text-slate-300">{trade.shares.toLocaleString()}</td>
-                          <td className="td text-slate-300">{money(trade.price)}</td>
-                          <td className="td text-slate-300">{money(trade.notional)}</td>
+                          <td className="td text-parch-300">{trade.shares.toLocaleString()}</td>
+                          <td className="td text-parch-300">{money(trade.price)}</td>
+                          <td className="td text-parch-300">{money(trade.notional)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
-                  <p className="px-3 py-6 text-center text-xs text-slate-500">{t("history.noTrades")}</p>
+                  <p className="px-3 py-6 text-center text-xs text-parch-600">{t("history.noTrades")}</p>
                 )}
               </div>
             </div>
