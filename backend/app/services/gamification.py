@@ -149,6 +149,15 @@ def check_all(db: Session, player: models.Player) -> list[str]:
     check("three_peat", streak.current_streak >= 3)
     check("stock_god", streak.current_streak >= 5)
 
+    prediction = (
+        db.query(models.PredictionStreak)
+        .filter(models.PredictionStreak.player_id == player.id)
+        .first()
+    )
+    if prediction is not None:
+        check("seer_3", prediction.best_streak >= 3)
+        check("seer_5", prediction.best_streak >= 5)
+
     try:
         from .chronicle import build_chronicle
 
@@ -218,6 +227,11 @@ def catalog(db: Session, player: models.Player, lang: str = "en") -> dict:
         .filter(models.RankStreak.player_id == player.id)
         .first()
     )
+    prediction = (
+        db.query(models.PredictionStreak)
+        .filter(models.PredictionStreak.player_id == player.id)
+        .first()
+    )
     return {
         "achievements": items,
         "milestones": milestones,
@@ -225,4 +239,6 @@ def catalog(db: Session, player: models.Player, lang: str = "en") -> dict:
         "unlocked_count": sum(1 for item in items if item["unlocked"]),
         "total_count": len(items),
         "best_streak": streak.best_streak if streak else 0,
+        "prediction_streak": prediction.current_streak if prediction else 0,
+        "best_prediction_streak": prediction.best_streak if prediction else 0,
     }

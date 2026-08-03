@@ -259,6 +259,34 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         >
           {t(action === "buy" ? "order.buyShares" : "order.sellShares")}
         </button>
+        {action === "buy" && mode === "market" ? (
+          <div>
+            <p className="mb-1.5 text-[11px] font-medium text-parch-600">
+              {t("judgment.tag")}
+            </p>
+            <div className="grid grid-cols-4 gap-1">
+              {[
+                ["rally", t("judgment.thesis.rally")],
+                ["dip", t("judgment.thesis.dip")],
+                ["gamble", t("judgment.thesis.gamble")],
+                ["value", t("judgment.thesis.value")],
+              ].map(([thesis, label]) => (
+                <button
+                  key={thesis}
+                  onClick={() => {
+                    api
+                      .createJudgment(stock.ticker, thesis)
+                      .then(() => setNotice(t("judgment.recorded")))
+                      .catch((error) => setNotice(error.message));
+                  }}
+                  className="btn btn-ghost px-1 py-1 text-[10px]"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <p className="text-[11px] leading-4 text-parch-600">
           {t("order.minimum", { min: 10, cash: money(cash) })}{" "}
           {action === "sell"

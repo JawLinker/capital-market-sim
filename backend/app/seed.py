@@ -42,6 +42,8 @@ ACHIEVEMENTS = [
     ("noodle_last", "Lights-Off Noodles", "Finish in last place. The noodles are on the house.", "risk"),
     ("three_peat", "Three-Peat", "Be rank 1 for three consecutive trading days.", "trading"),
     ("stock_god", "Stock Master", "Be rank 1 for five consecutive trading days.", "trading"),
+    ("seer_3", "Seer Apprentice", "Get 3 correct stock judgments in a row.", "trading"),
+    ("seer_5", "Oracle", "Get 5 correct stock judgments in a row.", "trading"),
 ]
 
 RIVALS = [

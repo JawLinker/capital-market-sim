@@ -145,6 +145,29 @@ class Decision(Base):
     created_at = Column(String(32), default=utc_now)
 
 
+class Judgment(Base):
+    __tablename__ = "judgments"
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False, index=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False, index=True)
+    thesis = Column(String(16), nullable=False)
+    buy_price = Column(Float, nullable=False)
+    buy_day = Column(Integer, nullable=False)
+    status = Column(String(12), nullable=False, default="open")
+    resolved_day = Column(Integer, nullable=True)
+    return_pct = Column(Float, nullable=True)
+
+
+class PredictionStreak(Base):
+    __tablename__ = "prediction_streaks"
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False, index=True)
+    current_streak = Column(Integer, nullable=False, default=0)
+    best_streak = Column(Integer, nullable=False, default=0)
+
+
 class Holding(Base):
     __tablename__ = "holdings"
     __table_args__ = (UniqueConstraint("player_id", "stock_id", name="uq_holding"),)

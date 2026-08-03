@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import FRONTEND_DIST
 from .database import Base, SessionLocal, engine, ensure_schema_compat
-from .routers import advisor, auth, bots, chronicle, decisions, duels, earnings, gamification, game, legends, news, orders, players, portfolio, quests, replay, stocks, stories, storylines, trades
+from .routers import advisor, auth, bots, chronicle, decisions, duels, earnings, gamification, game, legends, news, orders, players, portfolio, predictions, quests, replay, stocks, stories, storylines, trades
 from .seed import seed_database
 
 
@@ -57,6 +57,7 @@ app.include_router(replay.router)
 app.include_router(orders.router)
 app.include_router(duels.router)
 app.include_router(decisions.router)
+app.include_router(predictions.router)
 
 @app.get("/health")
 def health():

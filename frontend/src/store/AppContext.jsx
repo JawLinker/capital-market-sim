@@ -382,6 +382,23 @@ export function AppProvider({ children }) {
           addToast("achievement", t("duel.tied"), duel.rival);
         }
       });
+      (result.judgment_results || []).forEach((judgment) => {
+        if (judgment.status === "right") {
+          addToast(
+            "success",
+            t("judgment.right"),
+            `${judgment.name} · ${judgment.return_pct > 0 ? "+" : ""}${judgment.return_pct}%`
+          );
+          sounds.money();
+        } else if (judgment.status === "wrong") {
+          addToast(
+            "error",
+            t("judgment.wrong"),
+            `${judgment.name} · ${judgment.return_pct}%`
+          );
+          sounds.loss();
+        }
+      });
       sounds.advance();
       if ((result.portfolio?.summary?.daily_pnl || 0) > 0) {
         sounds.money();

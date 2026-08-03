@@ -164,6 +164,11 @@ export default function AchievementsView() {
               <Badge className="border-gold/40 bg-gold/10 text-gold">
                 {t("achievements.bestStreak", { days: achievements?.best_streak || 0 })}
               </Badge>
+              <Badge className="border-gold/40 bg-gold/10 text-gold">
+                {t("achievements.seerStreak", {
+                  days: achievements?.best_prediction_streak || 0,
+                })}
+              </Badge>
             </div>
           }
         />

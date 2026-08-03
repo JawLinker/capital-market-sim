@@ -98,6 +98,12 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ grade_key: gradeKey, option_key: optionKey }),
     }),
+  createJudgment: (ticker, thesis) =>
+    request("/api/judgments", {
+      method: "POST",
+      body: JSON.stringify({ ticker, thesis }),
+    }),
+  getJudgments: () => request("/api/judgments"),
   getPortfolio: () => request("/api/portfolio"),
   getAdvisorReport: () => request("/api/advisor/portfolio"),
   advisorChat: (message) =>

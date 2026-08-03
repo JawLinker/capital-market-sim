@@ -20,6 +20,7 @@ from ..services.blackswan import (
 from ..services.decisions import create_black_swan_decision
 from ..services.duels import settle_duels
 from ..services.pending_orders import execute_pending_orders
+from ..services.predictions import validate_judgments
 
 router = APIRouter(prefix="/api", tags=["game"])
 
@@ -101,6 +102,7 @@ def post_advance(
         result = advance_day(db)
     execute_pending_orders(db)
     duel_results = settle_duels(db)
+    judgment_results = validate_judgments(db)
     black_swan = None
     if days == 1 and random.random() < 0.03:
         state = db.query(models.GameState).first()
@@ -149,6 +151,11 @@ def post_advance(
         "portfolio": summary,
         "black_swan": black_swan,
         "duel_results": duel_results,
+        "judgment_results": [
+            result
+            for result in judgment_results
+            if result["player_id"] == player.id
+        ],
     }
 
 
@@ -176,9 +183,11 @@ def post_reset(request: Request, db: Session = Depends(get_db)):
             models.Holding,
             models.RankStreak,
             models.StorylineProgress,
-            models.PendingOrder,
-            models.Duel,
-            models.Decision,
+        models.PendingOrder,
+        models.Duel,
+        models.Decision,
+        models.Judgment,
+        models.PredictionStreak,
         ):
             db.query(table).filter(table.player_id.in_(guest_ids)).delete(
                 synchronize_session=False
@@ -193,6 +202,7 @@ def post_reset(request: Request, db: Session = Depends(get_db)):
         models.PendingOrder,
         models.Duel,
         models.Decision,
+        models.Judgment,
     ):
         db.query(table).filter(table.player_id == player.id).delete(
             synchronize_session=False
@@ -222,5 +232,13 @@ def post_reset(request: Request, db: Session = Depends(get_db)):
         if streak is not None:
             streak.current_streak = 0
             streak.last_day = -1
+            db.commit()
+        prediction = (
+            db.query(models.PredictionStreak)
+            .filter(models.PredictionStreak.player_id == host.id)
+            .first()
+        )
+        if prediction is not None:
+            prediction.current_streak = 0
             db.commit()
     return {"status": "reset", "day": 0}
