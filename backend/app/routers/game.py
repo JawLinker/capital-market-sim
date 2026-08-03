@@ -1,3 +1,5 @@
+import random
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
@@ -10,6 +12,7 @@ from ..services import portfolio
 from ..services.gamification import check_all
 from ..services.market_engine import advance_day
 from ..i18n import get_lang
+from ..services.blackswan import localize_black_swan, pick_black_swan
 
 router = APIRouter(prefix="/api", tags=["game"])
 
@@ -89,6 +92,27 @@ def post_advance(
     result = None
     for _ in range(days):
         result = advance_day(db)
+    black_swan = None
+    if days == 1 and random.random() < 0.03:
+        state = db.query(models.GameState).first()
+        event = pick_black_swan(state.date if state else result["date"])
+        if event is not None:
+            state.sentiment = max(0.05, min(1.0, state.sentiment + event["sentiment_delta"]))
+            db.add(
+                models.NewsEvent(
+                    day=result["day"],
+                    headline=event["title_zh"] if get_lang(request) == "zh" else event["title_en"],
+                    summary=(
+                        event["prose_zh"] if get_lang(request) == "zh" else event["prose_en"]
+                    ),
+                    category="market",
+                    scope="market",
+                    kind="blackswan",
+                    impact_pct=round(event["sentiment_delta"] * 100, 2),
+                )
+            )
+            db.commit()
+            black_swan = localize_black_swan({**event, "date": state.date}, get_lang(request))
     unlocked = check_all(db, player)
     summary = portfolio.portfolio_summary(db, player)
     return {
@@ -96,6 +120,7 @@ def post_advance(
         "days_advanced": days,
         "unlocked_achievements": unlocked,
         "portfolio": summary,
+        "black_swan": black_swan,
     }
 
 

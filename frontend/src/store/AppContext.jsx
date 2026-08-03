@@ -65,6 +65,7 @@ export function AppProvider({ children }) {
   const [chronicle, setChronicle] = useState(null);
   const [chronicleOpen, setChronicleOpen] = useState(false);
   const [eraTransition, setEraTransition] = useState(null);
+  const [blackSwan, setBlackSwan] = useState(null);
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
@@ -230,6 +231,7 @@ export function AppProvider({ children }) {
 
   const closeChronicle = useCallback(() => setChronicleOpen(false), []);
   const closeEraTransition = useCallback(() => setEraTransition(null), []);
+  const closeBlackSwan = useCallback(() => setBlackSwan(null), []);
 
   const login = useCallback(
     async (username, password) => {
@@ -307,6 +309,9 @@ export function AppProvider({ children }) {
     setBusy(true);
     try {
       const result = await api.advanceDay(count);
+      if (result.black_swan) {
+        setBlackSwan(result.black_swan);
+      }
       addToast("success", t("toast.advanced", { days: result.days_advanced }));
       announceUnlocks(result.unlocked_achievements);
       await Promise.all([refreshAll(), loadMarket()]);
@@ -414,6 +419,8 @@ export function AppProvider({ children }) {
       closeChronicle,
       eraTransition,
       closeEraTransition,
+      blackSwan,
+      closeBlackSwan,
       openStory,
       nextStory,
       closeStory,
@@ -457,6 +464,8 @@ export function AppProvider({ children }) {
       closeChronicle,
       eraTransition,
       closeEraTransition,
+      blackSwan,
+      closeBlackSwan,
       openStory,
       nextStory,
       closeStory,

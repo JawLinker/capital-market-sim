@@ -117,6 +117,10 @@ async function canvasCheck(page, label) {
   await page.waitForSelector("text=Retail Era Archive", { timeout: 15000 });
   await shot(page, "15-retail-story.png");
   await page.getByRole("button", { name: "Got it" }).click();
+  const swanClose = page.getByRole("button", { name: "Understood" });
+  if (await swanClose.isVisible().catch(() => false)) {
+    await swanClose.click();
+  }
 
   await page.getByTitle("Investor Journal").click();
   await page.waitForSelector("text=Holdings", { timeout: 15000 });
