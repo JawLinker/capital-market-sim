@@ -20,6 +20,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
   const [action, setAction] = useState(defaultAction);
   const [shares, setShares] = useState("");
   const [mode, setMode] = useState("market");
+  const [channel, setChannel] = useState("exchange");
   const [limitPrice, setLimitPrice] = useState("");
   const [orders, setOrders] = useState([]);
   const [notice, setNotice] = useState("");
@@ -92,7 +93,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         .catch((error) => setNotice(error.message));
       return;
     }
-    executeTrade(action, stock.ticker, shareCount, stock.name);
+    executeTrade(action, stock.ticker, shareCount, stock.name, channel === "dark");
     setShares("");
   };
 
@@ -161,7 +162,39 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
           {t("order.limit")}
         </button>
       </div>
+      {mode === "market" ? (
+        <div className="grid grid-cols-2 gap-1 border-b border-ink-600/70 p-2">
+          <button
+            onClick={() => setChannel("exchange")}
+            className={`flex items-center justify-center gap-1.5 rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              channel === "exchange"
+                ? "border-brass/50 bg-brass/15 text-brass"
+                : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
+            }`}
+          >
+            <Zap size={13} />
+            {t("order.channelExchange")}
+          </button>
+          <button
+            onClick={() => setChannel("dark")}
+            className={`flex items-center justify-center gap-1.5 rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              channel === "dark"
+                ? "border-ink-400/50 bg-ink-500/15 text-parch-200"
+                : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
+            }`}
+            title={t("order.darkHint")}
+          >
+            <ListOrdered size={13} />
+            {t("order.channelDark")}
+          </button>
+        </div>
+      ) : null}
       <div className="space-y-3 p-4">
+        {channel === "dark" && mode === "market" ? (
+          <p className="rounded-[3px] border border-ink-500/40 bg-ink-900/60 px-3 py-2 text-[11px] leading-5 text-parch-500">
+            {t("order.darkHint")}
+          </p>
+        ) : null}
         <div>
           <label className="mb-1.5 block text-xs font-medium text-parch-500">{t("order.shares")}</label>
           <div className="flex gap-2">

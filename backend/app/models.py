@@ -196,6 +196,7 @@ class Transaction(Base):
     net = Column(Float, nullable=False)
     realized_pnl = Column(Float, nullable=False, default=0.0)
     day = Column(Integer, nullable=False)
+    dark_pool = Column(Integer, nullable=False, default=0)
     executed_at = Column(String(32), default=utc_now)
 
 

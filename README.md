@@ -60,6 +60,8 @@ Every price move is real history, replayed day by day.
 - **Counterplay & dragon-tiger board**: overexposed players draw quiet
   distribution pressure from the market, and a daily dragon-tiger board reveals
   who bought and sold the hot names
+- **Dark pool channel**: big orders can fill at the midpoint, skip price
+  impact, and stay off the dragon-tiger board, subject to pool liquidity
 - **Newspaper earnings & policy wires**: giant-company earnings open as a
   Capital Daily front page, and policy/international shocks join the black swan
   pool from 2021 to 2026

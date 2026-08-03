@@ -494,10 +494,10 @@ export function AppProvider({ children }) {
   ]);
 
   const executeTrade = useCallback(
-    async (action, ticker, shares, displayName) => {
+    async (action, ticker, shares, displayName, darkPool = false) => {
       setBusy(true);
       try {
-        const result = await api.trade(action, ticker, shares);
+        const result = await api.trade(action, ticker, shares, darkPool);
         const verb = t(action === "buy" ? "toast.bought" : "toast.sold");
         if (action === "buy") {
           sounds.buy();

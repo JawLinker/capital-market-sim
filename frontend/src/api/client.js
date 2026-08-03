@@ -116,10 +116,10 @@ export const api = {
   getPlayerActivity: (limit = 30) => request(`/api/players/activity?limit=${limit}`),
   getBot: (id, limit = 120) => request(`/api/bots/${id}?limit=${limit}`),
   getTransactions: (limit = 100) => request(`/api/transactions?limit=${limit}`),
-  trade: (action, ticker, shares) =>
+  trade: (action, ticker, shares, darkPool = false) =>
     request("/api/trades", {
       method: "POST",
-      body: JSON.stringify({ action, ticker, shares }),
+      body: JSON.stringify({ action, ticker, shares, dark_pool: darkPool }),
     }),
   advanceDay: (days = 1) =>
     request("/api/game/advance", {

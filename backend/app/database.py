@@ -59,6 +59,7 @@ def ensure_schema_compat() -> None:
             ],
             "transactions": [
                 ("stamp_tax", "FLOAT DEFAULT 0"),
+                ("dark_pool", "INTEGER DEFAULT 0"),
             ],
             "players": [
                 ("username", "VARCHAR(40) DEFAULT 'host'"),

@@ -29,6 +29,7 @@ def create_trade(request: Request, body: TradeRequest, db: Session = Depends(get
         stock,
         body.action,
         body.shares,
+        body.dark_pool,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

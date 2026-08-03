@@ -7,6 +7,7 @@ class TradeRequest(BaseModel):
     action: Literal["buy", "sell"]
     ticker: str = Field(min_length=1, max_length=8)
     shares: float = Field(gt=0)
+    dark_pool: bool = False
 
 
 class ChatRequest(BaseModel):

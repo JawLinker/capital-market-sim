@@ -46,6 +46,8 @@ def today_board(db: Session, day: int, lang: str) -> list:
         amount = row.notional or row.shares * row.price
         net[row.stock_id] += amount if row.action == "buy" else -amount
     for row in transactions:
+        if row.dark_pool:
+            continue
         net[row.stock_id] += row.gross if row.action == "buy" else -row.gross
     ranked = sorted(net.items(), key=lambda item: -abs(item[1]))[:5]
     seats = SEATS_EN if lang != "zh" else SEATS

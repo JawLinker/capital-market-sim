@@ -190,6 +190,7 @@ def execute_trade(
     stock: models.Stock,
     action: str,
     shares: float,
+    dark_pool: bool = False,
 ) -> dict:
     shares = round(shares, 4)
     state = db.query(models.GameState).first()
@@ -199,7 +200,14 @@ def execute_trade(
             raise ValueError(
                 "\u73b0\u91d1\u4e0d\u8db3\uff0c\u65e0\u6cd5\u5b8c\u6210\u8be5\u8ba2\u5355\uff08\u542b\u624b\u7eed\u8d39\uff09"
             )
-    exec_price = execute_market_order(db, stock, state, shares, action)
+    if dark_pool:
+        mid = (stock.bid + stock.ask) / 2.0 if stock.bid and stock.ask else stock.price
+        exec_price = round(mid, 4)
+        pool_shares = int(stock.avg_volume * 0.02)
+        if shares > pool_shares:
+            raise ValueError("Dark pool liquidity exceeded; reduce size or use the exchange")
+    else:
+        exec_price = execute_market_order(db, stock, state, shares, action)
     if exec_price is None:
         if action == "buy":
             raise ValueError("\u6da8\u505c\u4e2d\uff0c\u6682\u65f6\u65e0\u6cd5\u4e70\u5165")
@@ -266,15 +274,17 @@ def execute_trade(
         net=net,
         realized_pnl=realized_pnl,
         day=state.day,
+        dark_pool=1 if dark_pool else 0,
     )
     db.add(transaction)
-    stock.volume = int((stock.volume or 0) + shares)
-    avg_volume = stock.avg_volume or 1
-    flow_ratio = shares / avg_volume
-    magnitude = min(0.012, max(0.0002, flow_ratio * 2.0))
-    impact = magnitude if action == "buy" else -magnitude
-    stock.player_impact = round((stock.player_impact or 0.0) + impact, 6)
-    stock.price = round(stock.price * (1 + impact), 4)
+    if not dark_pool:
+        stock.volume = int((stock.volume or 0) + shares)
+        avg_volume = stock.avg_volume or 1
+        flow_ratio = shares / avg_volume
+        magnitude = min(0.012, max(0.0002, flow_ratio * 2.0))
+        impact = magnitude if action == "buy" else -magnitude
+        stock.player_impact = round((stock.player_impact or 0.0) + impact, 6)
+        stock.price = round(stock.price * (1 + impact), 4)
     db.commit()
     return {
         "id": transaction.id,
@@ -288,6 +298,7 @@ def execute_trade(
         "net": net,
         "realized_pnl": realized_pnl,
         "day": state.day,
+        "dark_pool": dark_pool,
         "cash": player.cash,
     }
 
