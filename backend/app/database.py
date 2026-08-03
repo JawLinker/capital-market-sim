@@ -66,6 +66,7 @@ def ensure_schema_compat() -> None:
                 ("password_hash", "VARCHAR(128) DEFAULT ''"),
                 ("api_key", "VARCHAR(64) DEFAULT ''"),
                 ("is_host", "INTEGER DEFAULT 0"),
+                ("margin_debt", "FLOAT DEFAULT 0"),
             ],
         }
         for table, columns in additions.items():

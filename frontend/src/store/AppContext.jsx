@@ -384,6 +384,16 @@ export function AppProvider({ children }) {
         );
         sounds.money();
       });
+      (result.margin_results || []).forEach((forced) => {
+        addToast(
+          "error",
+          t("margin.forced"),
+          `${t("margin.ratio")} ${forced.ratio} · ${(forced.sold || [])
+            .map((item) => item.name)
+            .join(", ")}`
+        );
+        sounds.loss();
+      });
       if (result.black_swan) {
         setBlackSwan(result.black_swan);
         sounds.blackSwan();
@@ -494,10 +504,10 @@ export function AppProvider({ children }) {
   ]);
 
   const executeTrade = useCallback(
-    async (action, ticker, shares, displayName, darkPool = false) => {
+    async (action, ticker, shares, displayName, darkPool = false, leverage = 1) => {
       setBusy(true);
       try {
-        const result = await api.trade(action, ticker, shares, darkPool);
+        const result = await api.trade(action, ticker, shares, darkPool, leverage);
         const verb = t(action === "buy" ? "toast.bought" : "toast.sold");
         if (action === "buy") {
           sounds.buy();

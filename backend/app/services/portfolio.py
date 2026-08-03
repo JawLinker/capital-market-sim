@@ -65,6 +65,10 @@ def portfolio_summary(db: Session, player: models.Player | None = None) -> dict:
 
     return {
         "cash": round(player.cash, 2),
+        "margin_debt": round(player.margin_debt or 0.0, 2),
+        "margin_ratio": round(value / (player.margin_debt or 0.0), 2)
+        if player.margin_debt
+        else None,
         "invested": invested,
         "value": value,
         "starting_cash": player.starting_cash,
@@ -158,8 +162,11 @@ def _affordable_buy_shares(
     stock: models.Stock,
     state: models.GameState,
     requested: float,
+    budget: float | None = None,
 ) -> float:
     """Largest buy size that fits cash at the expected fill price, including fees."""
+    if budget is None:
+        budget = player.cash
     shares = round(requested, 4)
     if shares <= 0:
         return 0.0
@@ -171,13 +178,13 @@ def _affordable_buy_shares(
         gross = count * price
         return gross + max(MIN_FEE, gross * FEE_RATE)
 
-    if total_cost(shares) <= player.cash + 1e-6:
+    if total_cost(shares) <= budget + 1e-6:
         return shares
 
     low, high = 0.0, shares
     for _ in range(40):
         mid = (low + high) / 2.0
-        if total_cost(mid) <= player.cash + 1e-6:
+        if total_cost(mid) <= budget + 1e-6:
             low = mid
         else:
             high = mid
@@ -191,11 +198,20 @@ def execute_trade(
     action: str,
     shares: float,
     dark_pool: bool = False,
+    leverage: float = 1.0,
 ) -> dict:
     shares = round(shares, 4)
     state = db.query(models.GameState).first()
+    budget = player.cash
     if action == "buy":
-        shares = _affordable_buy_shares(player, stock, state, shares)
+        if leverage > 1.0:
+            equity = portfolio_value(db, player) - (player.margin_debt or 0.0)
+            max_borrow = max(
+                0.0,
+                equity * (leverage - 1.0) - (player.margin_debt or 0.0),
+            )
+            budget = player.cash + max_borrow
+        shares = _affordable_buy_shares(player, stock, state, shares, budget)
         if shares <= 0:
             raise ValueError(
                 "\u73b0\u91d1\u4e0d\u8db3\uff0c\u65e0\u6cd5\u5b8c\u6210\u8be5\u8ba2\u5355\uff08\u542b\u624b\u7eed\u8d39\uff09"
@@ -230,9 +246,15 @@ def execute_trade(
     if action == "buy":
         total_cost = gross + fee
         if player.cash + 0.02 < total_cost:
-            raise ValueError(
-                "\u73b0\u91d1\u4e0d\u8db3\uff0c\u65e0\u6cd5\u5b8c\u6210\u8be5\u8ba2\u5355\uff08\u542b\u624b\u7eed\u8d39\uff09"
-            )
+            if leverage <= 1.0:
+                raise ValueError(
+                    "\u73b0\u91d1\u4e0d\u8db3\uff0c\u65e0\u6cd5\u5b8c\u6210\u8be5\u8ba2\u5355\uff08\u542b\u624b\u7eed\u8d39\uff09"
+                )
+            borrow = round(total_cost - player.cash, 2)
+            player.margin_debt = round((player.margin_debt or 0.0) + borrow, 2)
+            player.cash = round(player.cash - (total_cost - borrow), 2)
+        else:
+            player.cash = round(player.cash - total_cost, 2)
         if holding is None:
             holding = models.Holding(
                 player_id=player.id,
@@ -246,7 +268,6 @@ def execute_trade(
         holding.avg_cost = (holding.shares * holding.avg_cost + gross) / new_shares
         holding.shares = new_shares
         holding.locked_shares = round((holding.locked_shares or 0.0) + shares, 4)
-        player.cash = round(player.cash - total_cost, 2)
         net = -total_cost
         realized_pnl = 0.0
     else:

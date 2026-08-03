@@ -51,6 +51,21 @@ export default function PortfolioView() {
         detail={t("portfolio.pageDetail")}
       />
 
+      {summary?.margin_debt > 0 ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-[3px] border border-risk/40 bg-risk/10 px-4 py-2.5 text-xs">
+          <span className="font-semibold text-risk">{t("portfolio.marginDebt")}</span>
+          <span className="tabular text-risk">{money(summary.margin_debt)}</span>
+          <span className="text-parch-600">·</span>
+          <span className="font-semibold text-parch-300">{t("portfolio.marginRatio")}</span>
+          <span className="tabular text-parch-300">
+            {summary.margin_ratio != null ? summary.margin_ratio.toFixed(2) : "…"}
+          </span>
+          {summary.margin_ratio != null && summary.margin_ratio < 1.5 ? (
+            <span className="font-semibold text-risk">{t("portfolio.marginDanger")}</span>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label={t("portfolio.statValue")} value={money(summary?.value)} icon={<Briefcase size={17} />} />
         <StatCard label={t("portfolio.statCash")} value={money(summary?.cash)} icon={<Banknote size={17} />} />

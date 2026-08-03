@@ -80,6 +80,7 @@ class Player(Base):
     is_host = Column(Integer, nullable=False, default=0)
     starting_cash = Column(Float, nullable=False)
     cash = Column(Float, nullable=False)
+    margin_debt = Column(Float, nullable=False, default=0.0)
     created_at = Column(String(32), default=utc_now)
 
 

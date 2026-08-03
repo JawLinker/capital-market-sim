@@ -8,6 +8,7 @@ class TradeRequest(BaseModel):
     ticker: str = Field(min_length=1, max_length=8)
     shares: float = Field(gt=0)
     dark_pool: bool = False
+    leverage: float = Field(default=1.0, ge=1.0, le=2.0)
 
 
 class ChatRequest(BaseModel):

@@ -24,6 +24,7 @@ from ..services.predictions import validate_judgments
 from ..services.newspaper import collect_newspaper
 from ..services.dividends import process_dividends
 from ..services.dragon_tiger import today_board
+from ..services.margin import process_margin
 
 router = APIRouter(prefix="/api", tags=["game"])
 
@@ -114,6 +115,7 @@ def post_advance(
     judgment_results = validate_judgments(db)
     newspaper = collect_newspaper(db, result["day"], get_lang(request))
     dividend_results = process_dividends(db)
+    margin_results = process_margin(db)
     stocks = db.query(models.Stock).all()
     movers = sorted(
         stocks,
@@ -203,6 +205,9 @@ def post_advance(
             {k: v for k, v in item.items() if k != "player_id"}
             for item in dividend_results
             if item["player_id"] == player.id
+        ],
+        "margin_results": [
+            item for item in margin_results if item["player_id"] == player.id
         ],
     }
 

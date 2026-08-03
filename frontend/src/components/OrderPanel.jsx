@@ -21,6 +21,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
   const [shares, setShares] = useState("");
   const [mode, setMode] = useState("market");
   const [channel, setChannel] = useState("exchange");
+  const [leverage, setLeverage] = useState(1);
   const [limitPrice, setLimitPrice] = useState("");
   const [orders, setOrders] = useState([]);
   const [notice, setNotice] = useState("");
@@ -93,7 +94,14 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         .catch((error) => setNotice(error.message));
       return;
     }
-    executeTrade(action, stock.ticker, shareCount, stock.name, channel === "dark");
+    executeTrade(
+      action,
+      stock.ticker,
+      shareCount,
+      stock.name,
+      channel === "dark",
+      leverage
+    );
     setShares("");
   };
 
@@ -194,6 +202,27 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
           <p className="rounded-[3px] border border-ink-500/40 bg-ink-900/60 px-3 py-2 text-[11px] leading-5 text-parch-500">
             {t("order.darkHint")}
           </p>
+        ) : null}
+        {action === "buy" && mode === "market" ? (
+          <div className="flex items-center justify-between gap-2 rounded-[3px] border border-ink-600/70 bg-ink-900/60 px-3 py-2">
+            <p className="text-[11px] font-medium text-parch-500">{t("order.leverage")}</p>
+            <div className="flex gap-1">
+              {[1, 1.5, 2].map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setLeverage(level)}
+                  className={`rounded px-2 py-0.5 text-[11px] font-semibold tabular transition-colors ${
+                    leverage === level
+                      ? "bg-risk/15 text-risk"
+                      : "text-parch-600 hover:text-parch-300"
+                  }`}
+                  title={t("order.marginHint")}
+                >
+                  {level}x
+                </button>
+              ))}
+            </div>
+          </div>
         ) : null}
         <div>
           <label className="mb-1.5 block text-xs font-medium text-parch-500">{t("order.shares")}</label>
