@@ -21,6 +21,7 @@ from ..services.decisions import create_black_swan_decision
 from ..services.duels import settle_duels
 from ..services.pending_orders import execute_pending_orders
 from ..services.predictions import validate_judgments
+from ..services.newspaper import collect_newspaper
 
 router = APIRouter(prefix="/api", tags=["game"])
 
@@ -103,6 +104,7 @@ def post_advance(
     execute_pending_orders(db)
     duel_results = settle_duels(db)
     judgment_results = validate_judgments(db)
+    newspaper = collect_newspaper(db, result["day"], get_lang(request))
     black_swan = None
     if days == 1 and random.random() < 0.03:
         state = db.query(models.GameState).first()
@@ -156,6 +158,7 @@ def post_advance(
             for result in judgment_results
             if result["player_id"] == player.id
         ],
+        "newspaper": newspaper,
     }
 
 

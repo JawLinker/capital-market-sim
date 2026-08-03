@@ -120,6 +120,10 @@ async function canvasCheck(page, label) {
   if (await swanClose.isVisible().catch(() => false)) {
     await swanClose.click();
   }
+  const paperClose = page.getByRole("button", { name: "Read" });
+  if (await paperClose.isVisible().catch(() => false)) {
+    await paperClose.click();
+  }
   await page.getByRole("button", { name: "Got it" }).click();
 
   await page.getByTitle("Investor Journal").click();

@@ -67,6 +67,7 @@ export function AppProvider({ children }) {
   const [chronicleOpen, setChronicleOpen] = useState(false);
   const [eraTransition, setEraTransition] = useState(null);
   const [blackSwan, setBlackSwan] = useState(null);
+  const [newspaper, setNewspaper] = useState(null);
   const [muted, setMutedState] = useState(
     () => localStorage.getItem("cms-muted") === "1"
   );
@@ -239,6 +240,7 @@ export function AppProvider({ children }) {
   const closeChronicle = useCallback(() => setChronicleOpen(false), []);
   const closeEraTransition = useCallback(() => setEraTransition(null), []);
   const closeBlackSwan = useCallback(() => setBlackSwan(null), []);
+  const closeNewspaper = useCallback(() => setNewspaper(null), []);
   const toggleMute = useCallback(() => {
     setMutedState((current) => {
       const next = !current;
@@ -365,6 +367,9 @@ export function AppProvider({ children }) {
     setBusy(true);
     try {
       const result = await api.advanceDay(count);
+      if (result.newspaper && result.newspaper.length > 0) {
+        setNewspaper(result.newspaper[0]);
+      }
       if (result.black_swan) {
         setBlackSwan(result.black_swan);
         sounds.blackSwan();
@@ -435,7 +440,14 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!autoPlay) return undefined;
     const timer = window.setInterval(() => {
-      if (busy || storyOpen || chronicleOpen || eraTransition || blackSwan) {
+      if (
+        busy ||
+        storyOpen ||
+        chronicleOpen ||
+        eraTransition ||
+        blackSwan ||
+        newspaper
+      ) {
         return;
       }
       advanceDay(1, { silent: true });
@@ -449,6 +461,7 @@ export function AppProvider({ children }) {
     chronicleOpen,
     eraTransition,
     blackSwan,
+    newspaper,
     advanceDay,
   ]);
 
@@ -554,6 +567,8 @@ export function AppProvider({ children }) {
       closeEraTransition,
       blackSwan,
       closeBlackSwan,
+      newspaper,
+      closeNewspaper,
       muted,
       toggleMute,
       autoPlay,
@@ -607,6 +622,8 @@ export function AppProvider({ children }) {
       closeEraTransition,
       blackSwan,
       closeBlackSwan,
+      newspaper,
+      closeNewspaper,
       muted,
       toggleMute,
       autoPlay,

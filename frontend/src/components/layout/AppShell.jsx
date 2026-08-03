@@ -27,6 +27,7 @@ import Avatar from "../Avatar.jsx";
 import BlackSwanModal from "../story/BlackSwanModal.jsx";
 import ChronicleModal from "../story/ChronicleModal.jsx";
 import EraTransitionModal from "../story/EraTransitionModal.jsx";
+import NewspaperModal from "../story/NewspaperModal.jsx";
 import RetailStoryModal from "../story/RetailStoryModal.jsx";
 
 const NAV_ITEMS = [
@@ -302,6 +303,7 @@ export default function AppShell({ children }) {
     chronicleOpen,
     eraTransition,
     blackSwan,
+    newspaper,
     authPlayer,
     setView,
     advanceDay,
@@ -372,6 +374,7 @@ export default function AppShell({ children }) {
       {chronicleOpen ? <ChronicleModal /> : null}
       {eraTransition ? <EraTransitionModal /> : null}
       {blackSwan ? <BlackSwanModal /> : null}
+      {newspaper ? <NewspaperModal /> : null}
     </div>
   );
 }
