@@ -67,3 +67,49 @@ def test_new_objective_types_evaluate(client):
         assert "current" in result
         assert "met" in result
     db.close()
+
+
+def test_commission_decision_accept(client):
+    card = client.get("/api/quests/commission").json()
+    assert card["status"] == "open"
+    assert card["decision_id"]
+    assert {option["key"] for option in card["options"]} == {
+        "accept",
+        "bargain",
+        "reject",
+    }
+    response = client.post(
+        f"/api/quests/commission/{card['decision_id']}/resolve",
+        json={"option_key": "accept"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "accepted"
+    next_card = client.get("/api/quests/commission").json()
+    assert next_card["status"] == "accepted"
+
+
+def test_commission_bargain_changes_target(client):
+    card = client.get("/api/quests/commission").json()
+    original = card["objective"]["target"]
+    response = client.post(
+        f"/api/quests/commission/{card['decision_id']}/resolve",
+        json={"option_key": "bargain"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "accepted"
+    next_card = client.get("/api/quests/commission").json()
+    assert next_card["objective"]["target"] != original
+
+
+def test_commission_reject_adds_cooldown(client):
+    card = client.get("/api/quests/commission").json()
+    response = client.post(
+        f"/api/quests/commission/{card['decision_id']}/resolve",
+        json={"option_key": "reject"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "rejected"
+    assert response.json()["cooldown_days"] == 5
+    next_card = client.get("/api/quests/commission").json()
+    assert next_card["status"] == "rejected"
+    assert next_card["cooldown_days"] == 5

@@ -66,6 +66,11 @@ export const api = {
   getChronicleBook: () => request("/api/chronicle/book"),
   getDailyQuest: () => request("/api/quests/daily"),
   getCommission: () => request("/api/quests/commission"),
+  resolveCommission: (decisionId, optionKey) =>
+    request(`/api/quests/commission/${decisionId}/resolve`, {
+      method: "POST",
+      body: JSON.stringify({ option_key: optionKey }),
+    }),
   getStorylines: () => request("/api/storylines"),
   getReplay: () => request("/api/replay"),
   getBots: () => request("/api/bots"),

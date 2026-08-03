@@ -65,6 +65,7 @@ export default function QuestBookView() {
   const [stake, setStake] = useState("100");
   const [days, setDays] = useState(10);
   const [duelNotice, setDuelNotice] = useState("");
+  const [commissionNotice, setCommissionNotice] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -97,6 +98,26 @@ export default function QuestBookView() {
       })
       .then((data) => setDuels(data.duels || []))
       .catch((error) => setDuelNotice(error.message));
+  };
+
+  const refreshCommission = () => {
+    api
+      .getCommission()
+      .then(setCommission)
+      .catch(() => {});
+  };
+
+  const resolveCommissionOption = (option) => {
+    if (!commission?.decision_id) return;
+    setCommissionNotice("");
+    api
+      .resolveCommission(commission.decision_id, option.key)
+      .then((result) => {
+        setCommissionNotice(result.message);
+        return api.getCommission();
+      })
+      .then(setCommission)
+      .catch((error) => setCommissionNotice(error.message));
   };
 
   const activeArc =
@@ -212,18 +233,59 @@ export default function QuestBookView() {
                     {commission.npc?.name}
                   </p>
                 </div>
+                {commission.status === "accepted" ? (
+                  <Badge className="ml-auto border-mint/40 bg-mint/10 text-mint">
+                    {t("commission.accepted")}
+                  </Badge>
+                ) : commission.status === "rejected" ? (
+                  <Badge className="ml-auto border-risk/40 bg-risk/10 text-risk">
+                    {t("commission.rejected")}
+                  </Badge>
+                ) : null}
               </div>
-              <p className="mt-3 text-sm leading-6 text-parch-400">{commission.description}</p>
-              <div className="mt-3">
-                <ObjectiveBlock objective={commission.objective} t={t} />
-              </div>
-              <div className="mt-3 flex items-center gap-2 rounded-[3px] border border-gold/40 bg-gold/10 px-3 py-2.5">
-                <Trophy size={14} className="text-gold" />
-                <p className="text-xs text-parch-300">
-                  {t("quest.reward")}:{" "}
-                  <span className="font-semibold text-gold">{commission.reward?.label}</span>
-                </p>
-              </div>
+              {commission.status === "rejected" ? (
+                <>
+                  <p className="mt-3 text-sm italic leading-6 text-parch-500">
+                    {commission.message}
+                  </p>
+                  <p className="mt-2 text-xs text-parch-600">
+                    {t("commission.cooldown", { days: commission.cooldown_days })}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="mt-3 text-sm leading-6 text-parch-400">{commission.description}</p>
+                  <div className="mt-3">
+                    <ObjectiveBlock objective={commission.objective} t={t} />
+                  </div>
+                  <div className="mt-3 flex items-center gap-2 rounded-[3px] border border-gold/40 bg-gold/10 px-3 py-2.5">
+                    <Trophy size={14} className="text-gold" />
+                    <p className="text-xs text-parch-300">
+                      {t("quest.reward")}:{" "}
+                      <span className="font-semibold text-gold">{commission.reward?.label}</span>
+                    </p>
+                  </div>
+                  {commission.status === "open" ? (
+                    <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                      {(commission.options || []).map((option) => (
+                        <button
+                          key={option.key}
+                          onClick={() => resolveCommissionOption(option)}
+                          className="btn btn-ghost"
+                        >
+                          <span className="block text-xs font-semibold">{option.label}</span>
+                          <span className="block text-[10px] text-parch-600">
+                            {option.detail}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </>
+              )}
+              {commissionNotice ? (
+                <p className="mt-3 text-xs text-brass">{commissionNotice}</p>
+              ) : null}
             </>
           ) : (
             <p className="text-xs text-parch-600">…</p>
