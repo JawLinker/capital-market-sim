@@ -10,6 +10,7 @@ import {
   ListChecks,
   LogOut,
   MessageCircleMore,
+  Pause,
   Play,
   RotateCcw,
   Sparkles,
@@ -96,6 +97,10 @@ function TopBar() {
     chronicle,
     muted,
     toggleMute,
+    autoPlay,
+    autoSpeed,
+    toggleAutoPlay,
+    setAutoSpeed,
   } = useApp();
   const [fastDays, setFastDays] = useState(30);
   const market = gameState?.market;
@@ -112,8 +117,8 @@ function TopBar() {
   };
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-ink-600/70 bg-ink-900/90 px-4">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="flex h-14 shrink-0 items-center gap-3 overflow-x-auto border-b border-ink-600/70 bg-ink-900/90 px-4">
+      <div className="flex shrink-0 items-center gap-3">
         <div className="min-w-0">
           <p className="truncate font-display text-sm font-bold text-parch-100">
             {market?.date ? `${era.label} · ${market.date}` : era.label}
@@ -180,7 +185,33 @@ function TopBar() {
                 title={t("topbar.fastForward")}
               >
                 <FastForward size={13} />
-                <span className="hidden lg:inline">{t("topbar.fastForward")}</span>
+                <span className="hidden xl:inline">{t("topbar.fastForward")}</span>
+              </button>
+              <span className="mx-0.5 h-4 w-px bg-ink-600" />
+              {[1, 2, 4].map((speed) => (
+                <button
+                  key={speed}
+                  onClick={() => setAutoSpeed(speed)}
+                  className={`rounded px-1.5 py-0.5 text-[11px] font-semibold tabular transition-colors ${
+                    autoSpeed === speed
+                      ? "bg-brass/20 text-brass"
+                      : "text-parch-600 hover:text-parch-300"
+                  }`}
+                  title={t("topbar.autoSpeed")}
+                >
+                  {speed}x
+                </button>
+              ))}
+              <button
+                onClick={toggleAutoPlay}
+                className={`rounded px-2 py-1 transition-colors ${
+                  autoPlay
+                    ? "bg-risk/15 text-risk"
+                    : "text-brass hover:bg-brass/10"
+                }`}
+                title={autoPlay ? t("topbar.autoStop") : t("topbar.auto")}
+              >
+                {autoPlay ? <Pause size={13} /> : <Play size={13} />}
               </button>
             </div>
           </>
@@ -191,7 +222,7 @@ function TopBar() {
           title={t("story.button")}
         >
           <MessageCircleMore size={16} />
-          <span className="hidden sm:inline">{t("story.button")}</span>
+          <span className="hidden xl:inline">{t("story.button")}</span>
         </button>
         <button
           onClick={() => setLang(lang === "en" ? "zh" : "en")}
@@ -199,7 +230,7 @@ function TopBar() {
           title={lang === "en" ? "切换中文" : "Switch to English"}
         >
           <Globe size={16} />
-          <span className="hidden sm:inline">{lang === "en" ? "中文" : "EN"}</span>
+          <span className="hidden xl:inline">{lang === "en" ? "中文" : "EN"}</span>
         </button>
         <button
           onClick={toggleMute}

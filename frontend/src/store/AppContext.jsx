@@ -70,6 +70,8 @@ export function AppProvider({ children }) {
   const [muted, setMutedState] = useState(
     () => localStorage.getItem("cms-muted") === "1"
   );
+  const [autoPlay, setAutoPlay] = useState(false);
+  const [autoSpeed, setAutoSpeed] = useState(2);
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
@@ -357,7 +359,7 @@ export function AppProvider({ children }) {
     [refreshAll, loadMarket]
   );
 
-  const advanceDay = useCallback(async (days = 1) => {
+  const advanceDay = useCallback(async (days = 1, options = {}) => {
     if (busy) return;
     const count = Number.isFinite(days) ? Math.max(1, Math.min(250, Math.round(days))) : 1;
     setBusy(true);
@@ -399,7 +401,9 @@ export function AppProvider({ children }) {
           sounds.loss();
         }
       });
-      sounds.advance();
+      if (!options.silent) {
+        sounds.advance();
+      }
       if ((result.portfolio?.summary?.daily_pnl || 0) > 0) {
         sounds.money();
       } else if ((result.portfolio?.summary?.daily_pnl || 0) < 0) {
@@ -412,7 +416,8 @@ export function AppProvider({ children }) {
       if (
         todayStory &&
         result.days_advanced === 1 &&
-        result.result?.day % 5 === 1
+        result.result?.day % 5 === 1 &&
+        !options.silent
       ) {
         setStoryOpen(true);
       }
@@ -422,6 +427,30 @@ export function AppProvider({ children }) {
       setBusy(false);
     }
   }, [busy, refreshAll, loadMarket, announceUnlocks, loadStory, addToast, t]);
+
+  const toggleAutoPlay = useCallback(() => {
+    setAutoPlay((current) => !current);
+  }, []);
+
+  useEffect(() => {
+    if (!autoPlay) return undefined;
+    const timer = window.setInterval(() => {
+      if (busy || storyOpen || chronicleOpen || eraTransition || blackSwan) {
+        return;
+      }
+      advanceDay(1, { silent: true });
+    }, 3000 / autoSpeed);
+    return () => window.clearInterval(timer);
+  }, [
+    autoPlay,
+    autoSpeed,
+    busy,
+    storyOpen,
+    chronicleOpen,
+    eraTransition,
+    blackSwan,
+    advanceDay,
+  ]);
 
   const executeTrade = useCallback(
     async (action, ticker, shares, displayName) => {
@@ -527,6 +556,10 @@ export function AppProvider({ children }) {
       closeBlackSwan,
       muted,
       toggleMute,
+      autoPlay,
+      autoSpeed,
+      toggleAutoPlay,
+      setAutoSpeed,
       resolveBlackSwanOption,
       applyEraBonus,
       openStory,
@@ -576,6 +609,10 @@ export function AppProvider({ children }) {
       closeBlackSwan,
       muted,
       toggleMute,
+      autoPlay,
+      autoSpeed,
+      toggleAutoPlay,
+      setAutoSpeed,
       resolveBlackSwanOption,
       applyEraBonus,
       openStory,
