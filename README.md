@@ -57,6 +57,9 @@ Every price move is real history, replayed day by day.
   prices tick live, and events pause the action
 - **Player price impact**: your buy and sell orders push prices, shown as a
   live impact badge, and the effect decays over the following trading days
+- **Counterplay & dragon-tiger board**: overexposed players draw quiet
+  distribution pressure from the market, and a daily dragon-tiger board reveals
+  who bought and sold the hot names
 - **Newspaper earnings & policy wires**: giant-company earnings open as a
   Capital Daily front page, and policy/international shocks join the black swan
   pool from 2021 to 2026

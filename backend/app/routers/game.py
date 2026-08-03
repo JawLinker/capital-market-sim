@@ -23,6 +23,7 @@ from ..services.pending_orders import execute_pending_orders
 from ..services.predictions import validate_judgments
 from ..services.newspaper import collect_newspaper
 from ..services.dividends import process_dividends
+from ..services.dragon_tiger import today_board
 
 router = APIRouter(prefix="/api", tags=["game"])
 
@@ -60,6 +61,7 @@ def _market_overview(db: Session, lang: str = "en"):
         if state.benchmark_prev
         else 0.0,
         "northbound_flow": northbound_flow,
+        "dragon_tiger": today_board(db, max(state.day - 1, 0), lang),
         "gainers": [
             {
                 "ticker": s.ticker,

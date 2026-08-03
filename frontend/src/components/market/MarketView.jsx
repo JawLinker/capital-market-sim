@@ -12,7 +12,7 @@ import {
 } from "../../utils/format.js";
 import PriceChart from "../charts/PriceChart.jsx";
 import OrderPanel from "../OrderPanel.jsx";
-import { Badge, Change, MarketCapCell, VolumeCell } from "../ui.jsx";
+import { Badge, Change, EmptyState, MarketCapCell, SectionTitle, VolumeCell } from "../ui.jsx";
 
 const SORT_KEYS = {
   ticker: (a, b) => a.ticker.localeCompare(b.ticker),
@@ -362,6 +362,41 @@ export default function MarketView() {
                 ) : null}
               </ul>
             </div>
+
+            <section className="panel overflow-hidden">
+              <SectionTitle
+                title={t("market.dragonTiger")}
+                detail={t("market.dragonTigerDetail")}
+              />
+              {(gameState?.market?.dragon_tiger || []).length > 0 ? (
+                <ul className="divide-y divide-ink-600/50">
+                  {(gameState?.market?.dragon_tiger || []).map((item) => (
+                    <li key={item.ticker} className="px-4 py-2.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs font-semibold text-parch-100">{item.name}</p>
+                        <p
+                          className={`text-xs font-bold tabular ${
+                            item.net >= 0 ? "text-mint" : "text-risk"
+                          }`}
+                        >
+                          {item.net >= 0 ? "+" : ""}
+                          {compactMoney(item.net)}
+                        </p>
+                      </div>
+                      <p className="mt-1 text-[11px] text-parch-600">
+                        {t("market.buySeat")} {item.buy_seat} · {t("market.sellSeat")}{" "}
+                        {item.sell_seat}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <EmptyState
+                  title={t("market.dragonTigerEmpty")}
+                  detail={t("market.advanceForNews")}
+                />
+              )}
+            </section>
           </>
         ) : (
           <div className="panel flex flex-1 items-center justify-center p-8 text-sm text-parch-600">

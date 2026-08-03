@@ -12,7 +12,7 @@ from .fundamentals import (
     fundamental_price,
     policy_target_rate,
 )
-from .bots import refresh_rival_values, tick_bots
+from .bots import flow_impact, refresh_rival_values, tick_bots
 from .orderbook import refresh_book
 from .replay import index_row, next_replay_index, replay_rows
 
@@ -123,6 +123,7 @@ EVENT_HEADLINES = {
     "earnings_beat": "{name} crushes quarterly earnings estimates, shares jump",
     "earnings_miss": "{name} misses quarterly earnings expectations",
     "dividend": "{name} pays cash dividend",
+    "counterplay": "{name} faces quiet distribution",
     "product_launch": "{name} unveils next-generation flagship product",
     "lawsuit": "{name} hit with class-action lawsuit",
     "regulation_probe": "Regulators open investigation into {name}",
@@ -150,6 +151,7 @@ EVENT_SUMMARIES = {
     "earnings_beat": "Revenue and profit both came in ahead of consensus, a classic earnings surprise that can re-rate a stock quickly.",
     "earnings_miss": "The company reported below expectations, which often triggers an immediate repricing of growth assumptions.",
     "dividend": "Shareholders receive a cash dividend; the price adjusts down by the payout on the ex-date.",
+    "counterplay": "Some seats are quietly trimming the name, leaning against crowded retail positioning.",
     "product_launch": "A flagship launch can expand the addressable market and lift forward revenue estimates.",
     "lawsuit": "Legal exposure introduces potential settlement costs and reputational overhang.",
     "regulation_probe": "Regulatory scrutiny raises uncertainty about future business practices and fines.",
@@ -177,6 +179,7 @@ EVENT_HEADLINES_ZH = {
     "earnings_beat": "{name}\u5b63\u5ea6\u8d22\u62a5\u5927\u8d85\u9884\u671f\uff0c\u80a1\u4ef7\u5927\u6da8",
     "earnings_miss": "{name}\u5b63\u5ea6\u8d22\u62a5\u4e0d\u53ca\u9884\u671f",
     "dividend": "{name}\u6d3e\u53d1\u73b0\u91d1\u5206\u7ea2",
+    "counterplay": "{name}\u906d\u9047\u6c89\u9ed8\u51cf\u6301",
     "product_launch": "{name}\u53d1\u5e03\u65b0\u4e00\u4ee3\u65d7\u8230\u4ea7\u54c1",
     "lawsuit": "{name}\u906d\u9047\u96c6\u4f53\u8bc9\u8bbc",
     "regulation_probe": "\u76d1\u7ba1\u673a\u6784\u5bf9{name}\u5c55\u5f00\u8c03\u67e5",
@@ -204,6 +207,7 @@ EVENT_SUMMARIES_ZH = {
     "earnings_beat": "\u8425\u6536\u4e0e\u5229\u6da6\u53cc\u53cc\u8d85\u51fa\u9884\u671f\uff0c\u8fd9\u662f\u5178\u578b\u7684\u76c8\u5229\u60ca\u559c\uff0c\u53ef\u80fd\u8fc5\u901f\u63a8\u52a8\u80a1\u4ef7\u91cd\u4f30\u3002",
     "earnings_miss": "\u516c\u53f8\u4e1a\u7ee9\u4f4e\u4e8e\u9884\u671f\uff0c\u901a\u5e38\u4f1a\u5f15\u53d1\u5e02\u573a\u5bf9\u589e\u957f\u5047\u8bbe\u7684\u5feb\u901f\u4fee\u6b63\u3002",
     "dividend": "\u80a1\u4e1c\u83b7\u5f97\u73b0\u91d1\u5206\u7ea2\uff0c\u9664\u606f\u65e5\u80a1\u4ef7\u6309\u6d3e\u606f\u989d\u76f8\u5e94\u4e0b\u8c03\u3002",
+    "counterplay": "\u67d0\u4e9b\u5e2d\u4f4d\u6b63\u5728\u9759\u9ed8\u51cf\u6301\uff0c\u504f\u62b5\u62e5\u6324\u7684\u6563\u6237\u4ed3\u4f4d\u3002",
     "product_launch": "\u65d7\u8230\u4ea7\u54c1\u53d1\u5e03\u6709\u671b\u6269\u5927\u53ef\u89e6\u8fbe\u5e02\u573a\uff0c\u5e76\u63d0\u632f\u672a\u6765\u8425\u6536\u9884\u671f\u3002",
     "lawsuit": "\u6cd5\u5f8b\u98ce\u9669\u5e26\u6765\u6f5c\u5728\u7684\u8d54\u507f\u6210\u672c\u4e0e\u58f0\u8a89\u538b\u529b\u3002",
     "regulation_probe": "\u76d1\u7ba1\u5ba1\u67e5\u589e\u52a0\u4e86\u672a\u6765\u7ecf\u8425\u65b9\u5f0f\u4e0e\u7f5a\u6b3e\u7684\u4e0d\u786e\u5b9a\u6027\u3002",
@@ -432,6 +436,52 @@ def _replay_news(db: Session, state: models.GameState, gainer, loser) -> list[mo
     return events
 
 
+def _run_counterplay(db: Session, state: models.GameState, stocks: list) -> None:
+    price_by_id = {stock.id: stock.price for stock in stocks}
+    stock_by_id = {stock.id: stock for stock in stocks}
+    for player in db.query(models.Player).all():
+        holdings = (
+            db.query(models.Holding)
+            .filter(models.Holding.player_id == player.id)
+            .all()
+        )
+        if not holdings:
+            continue
+        total = player.cash + sum(
+            holding.shares * price_by_id.get(holding.stock_id, 0.0)
+            for holding in holdings
+        )
+        if total <= 0:
+            continue
+        best = max(
+            holdings,
+            key=lambda holding: holding.shares * price_by_id.get(holding.stock_id, 0.0),
+        )
+        stock = stock_by_id.get(best.stock_id)
+        if stock is None or stock.price <= 0:
+            continue
+        holding_value = best.shares * stock.price
+        if holding_value / total < 0.12:
+            continue
+        notional = min(holding_value * 0.03, stock.price * stock.avg_volume * 0.05)
+        impact = flow_impact(notional, stock.avg_volume, stock.price)
+        stock.price = round(max(0.01, stock.price * (1 - impact)), 4)
+        stock.volume += int(notional / max(0.01, stock.price))
+        refresh_book(stock, state)
+        db.add(
+            models.NewsEvent(
+                day=state.day,
+                headline="{name} faces quiet distribution",
+                summary="counterplay",
+                category="negative",
+                scope="stock",
+                kind="counterplay",
+                stock_id=stock.id,
+                impact_pct=round(-impact * 100, 2),
+            )
+        )
+
+
 def advance_day(db: Session, rng: random.Random | None = None) -> dict:
     """Advance one trading day by replaying the next real A-share daily row."""
     rng = rng or random.Random(SEED + db.query(models.GameState).first().day)
@@ -546,6 +596,7 @@ def advance_day(db: Session, rng: random.Random | None = None) -> dict:
         refresh_book(stock, state)
         stock.updated_at = models.utc_now()
 
+    _run_counterplay(db, state, stocks)
     events = _replay_news(db, state, gainer, loser)
 
     state.benchmark_prev = state.benchmark_value
