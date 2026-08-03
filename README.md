@@ -64,6 +64,8 @@ Every price move is real history, replayed day by day.
   impact, and stay off the dragon-tiger board, subject to pool liquidity
 - **Margin financing**: buy with 1x-2x leverage, pay daily interest, and face
   forced liquidation when the maintenance ratio drops below 130%
+- **Margin call grace**: falling below 130% starts a 3-day top-up window, and
+  the portfolio page offers a one-click margin repayment to self-rescue
 - **Newspaper earnings & policy wires**: giant-company earnings open as a
   Capital Daily front page, and policy/international shocks join the black swan
   pool from 2021 to 2026

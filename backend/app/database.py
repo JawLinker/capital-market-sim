@@ -67,6 +67,8 @@ def ensure_schema_compat() -> None:
                 ("api_key", "VARCHAR(64) DEFAULT ''"),
                 ("is_host", "INTEGER DEFAULT 0"),
                 ("margin_debt", "FLOAT DEFAULT 0"),
+                ("margin_call_day", "INTEGER DEFAULT -1"),
+                ("margin_call_deadline", "INTEGER DEFAULT -1"),
             ],
         }
         for table, columns in additions.items():

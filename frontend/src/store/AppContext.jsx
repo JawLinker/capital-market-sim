@@ -385,14 +385,23 @@ export function AppProvider({ children }) {
         sounds.money();
       });
       (result.margin_results || []).forEach((forced) => {
-        addToast(
-          "error",
-          t("margin.forced"),
-          `${t("margin.ratio")} ${forced.ratio} · ${(forced.sold || [])
-            .map((item) => item.name)
-            .join(", ")}`
-        );
-        sounds.loss();
+        if (forced.forced) {
+          addToast(
+            "error",
+            t("margin.forced"),
+            `${t("margin.ratio")} ${forced.ratio} · ${(forced.sold || [])
+              .map((item) => item.name)
+              .join(", ")}`
+          );
+          sounds.loss();
+        } else if (forced.margin_call) {
+          addToast(
+            "error",
+            t("margin.call"),
+            t("margin.callDays", { days: forced.days_left })
+          );
+          sounds.loss();
+        }
       });
       if (result.black_swan) {
         setBlackSwan(result.black_swan);

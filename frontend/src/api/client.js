@@ -88,6 +88,11 @@ export const api = {
       body: JSON.stringify({ rival_id: rivalId, stake, days }),
     }),
   getDuels: () => request("/api/duels"),
+  repayMargin: (amount) =>
+    request("/api/margin/repay", {
+      method: "POST",
+      body: JSON.stringify({ amount }),
+    }),
   resolveDecision: (decisionId, optionKey) =>
     request(`/api/decisions/${decisionId}/resolve`, {
       method: "POST",

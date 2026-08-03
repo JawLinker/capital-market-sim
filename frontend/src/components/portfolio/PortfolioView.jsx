@@ -18,7 +18,7 @@ import { MuseumHeader } from "../museum.jsx";
 import { Badge, Change, EmptyState, SectionTitle, StatCard } from "../ui.jsx";
 
 export default function PortfolioView() {
-  const { portfolio, selectTicker, t } = useApp();
+  const { portfolio, selectTicker, refreshAll, t } = useApp();
   const [guardNotice, setGuardNotice] = useState("");
   const summary = portfolio?.summary;
   const holdings = portfolio?.holdings || [];
@@ -43,6 +43,18 @@ export default function PortfolioView() {
       .catch((error) => setGuardNotice(error.message));
   };
 
+  const repayAll = () => {
+    const amount = Math.min(summary?.cash || 0, summary?.margin_debt || 0);
+    if (amount <= 0) return;
+    api
+      .repayMargin(amount)
+      .then(() => {
+        setGuardNotice(t("portfolio.repaid"));
+        return refreshAll();
+      })
+      .catch((error) => setGuardNotice(error.message));
+  };
+
   return (
     <div className="space-y-4 p-4 lg:p-5">
       <MuseumHeader
@@ -63,6 +75,17 @@ export default function PortfolioView() {
           {summary.margin_ratio != null && summary.margin_ratio < 1.5 ? (
             <span className="font-semibold text-risk">{t("portfolio.marginDanger")}</span>
           ) : null}
+          {summary.margin_call_active ? (
+            <span className="font-bold text-risk">
+              {t("portfolio.marginCall")} ·{" "}
+              {t("portfolio.marginCallDays", {
+                days: summary.margin_call_days_left,
+              })}
+            </span>
+          ) : null}
+          <button onClick={repayAll} className="btn btn-danger px-3 py-1 text-[11px]">
+            {t("portfolio.repay")}
+          </button>
         </div>
       ) : null}
 

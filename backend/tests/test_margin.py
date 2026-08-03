@@ -54,6 +54,8 @@ def test_forced_liquidation(client):
     stock = db.query(models.Stock).first()
     player.cash = 0.0
     player.margin_debt = 100_000.0
+    player.margin_call_day = 0
+    player.margin_call_deadline = 0
     db.add(
         models.Holding(
             player_id=player.id,
@@ -76,4 +78,74 @@ def test_forced_liquidation(client):
         .count()
     )
     assert holdings == 0
+    db.close()
+
+
+def test_margin_call_grace_period(client):
+    from app import models
+    from app.database import SessionLocal
+
+    db = SessionLocal()
+    player = db.query(models.Player).first()
+    stock = db.query(models.Stock).first()
+    player.cash = 0.0
+    player.margin_debt = 100_000.0
+    db.add(
+        models.Holding(
+            player_id=player.id,
+            stock_id=stock.id,
+            shares=800,
+            avg_cost=10.0,
+        )
+    )
+    db.commit()
+    db.close()
+
+    body = client.post("/api/game/advance").json()
+    results = body.get("margin_results", [])
+    assert results and results[0]["margin_call"] is True
+    assert results[0]["days_left"] == 3
+
+    db = SessionLocal()
+    holdings = (
+        db.query(models.Holding)
+        .filter(models.Holding.player_id == player.id)
+        .count()
+    )
+    assert holdings == 1
+    db.close()
+
+
+def test_repay_margin_clears_call(client):
+    from app import models
+    from app.database import SessionLocal
+
+    db = SessionLocal()
+    player = db.query(models.Player).first()
+    stock = db.query(models.Stock).first()
+    player.cash = 60_000.0
+    player.margin_debt = 100_000.0
+    player.margin_call_day = 0
+    player.margin_call_deadline = 3
+    db.add(
+        models.Holding(
+            player_id=player.id,
+            stock_id=stock.id,
+            shares=800,
+            avg_cost=10.0,
+        )
+    )
+    db.commit()
+    db.close()
+
+    response = client.post(
+        "/api/margin/repay",
+        json={"amount": 60_000},
+    )
+    assert response.status_code == 200
+    assert response.json()["repaid"] == 60_000
+
+    db = SessionLocal()
+    player = db.query(models.Player).first()
+    assert player.margin_debt == 40_000
     db.close()

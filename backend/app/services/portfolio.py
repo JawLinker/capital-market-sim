@@ -54,6 +54,8 @@ def portfolio_summary(db: Session, player: models.Player | None = None) -> dict:
     value = round(portfolio_value(db, player), 2)
     invested = round(value - player.cash, 2)
     total_return = (value - player.starting_cash) / player.starting_cash
+    state = db.query(models.GameState).first()
+    margin_call_active = (player.margin_call_day or -1) >= 0
 
     snapshot = latest_snapshot(db, player)
     if snapshot:
@@ -69,6 +71,13 @@ def portfolio_summary(db: Session, player: models.Player | None = None) -> dict:
         "margin_ratio": round(value / (player.margin_debt or 0.0), 2)
         if player.margin_debt
         else None,
+        "margin_call_active": margin_call_active,
+        "margin_call_days_left": max(
+            0,
+            (player.margin_call_deadline or -1) - (state.day if state else 0),
+        )
+        if margin_call_active
+        else 0,
         "invested": invested,
         "value": value,
         "starting_cash": player.starting_cash,

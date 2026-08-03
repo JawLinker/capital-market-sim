@@ -81,6 +81,8 @@ class Player(Base):
     starting_cash = Column(Float, nullable=False)
     cash = Column(Float, nullable=False)
     margin_debt = Column(Float, nullable=False, default=0.0)
+    margin_call_day = Column(Integer, nullable=False, default=-1)
+    margin_call_deadline = Column(Integer, nullable=False, default=-1)
     created_at = Column(String(32), default=utc_now)
 
 
