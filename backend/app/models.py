@@ -52,6 +52,7 @@ class Stock(Base):
     momentum_20d = Column(Float, default=0.0)
     momentum_60d = Column(Float, default=0.0)
     updated_at = Column(String(32), default=utc_now)
+    player_impact = Column(Float, nullable=False, default=0.0)
 
 
 class PriceHistory(Base):

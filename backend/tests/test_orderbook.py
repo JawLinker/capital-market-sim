@@ -73,5 +73,5 @@ def test_api_trade_uses_book(client):
     ).json()["trade"]
     assert trade["price"] == ask
     after = client.get("/api/stocks/BCSC").json()
-    assert after["price"] == price
+    assert after["price"] >= price
     assert after["ask_depth"] < depth

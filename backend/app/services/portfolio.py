@@ -269,6 +269,12 @@ def execute_trade(
     )
     db.add(transaction)
     stock.volume = int((stock.volume or 0) + shares)
+    avg_volume = stock.avg_volume or 1
+    flow_ratio = shares / avg_volume
+    magnitude = min(0.012, max(0.0002, flow_ratio * 2.0))
+    impact = magnitude if action == "buy" else -magnitude
+    stock.player_impact = round((stock.player_impact or 0.0) + impact, 6)
+    stock.price = round(stock.price * (1 + impact), 4)
     db.commit()
     return {
         "id": transaction.id,

@@ -55,6 +55,8 @@ Every price move is real history, replayed day by day.
 - **Auto play**: a countdown-driven live market mode where each trading day
   lasts 0.5-2 minutes (default 2), one week takes about 10 minutes, intraday
   prices tick live, and events pause the action
+- **Player price impact**: your buy and sell orders push prices, shown as a
+  live impact badge, and the effect decays over the following trading days
 - **Newspaper earnings & policy wires**: giant-company earnings open as a
   Capital Daily front page, and policy/international shocks join the black swan
   pool from 2021 to 2026

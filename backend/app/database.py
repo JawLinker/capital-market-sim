@@ -42,6 +42,7 @@ def ensure_schema_compat() -> None:
                 ("ask_depth", "INTEGER DEFAULT 0"),
                 ("liquidity_factor", "FLOAT DEFAULT 1"),
                 ("limit_pct", "FLOAT DEFAULT 10"),
+                ("player_impact", "FLOAT DEFAULT 0"),
             ],
             "game_state": [
                 ("policy_rate", "FLOAT DEFAULT 4.25"),

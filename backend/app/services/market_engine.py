@@ -483,8 +483,10 @@ def advance_day(db: Session, rng: random.Random | None = None) -> dict:
         if loser is None or real_return < loser[0]:
             loser = (real_return, stock)
 
+        impact = stock.player_impact or 0.0
         stock.prev_close = round(prev, 2)
-        stock.price = round(close, 2)
+        stock.price = round(close * (1 + impact), 2)
+        stock.player_impact = round(impact * 0.85, 6)
         stock.volume = int(row["v"]) + int(bot_volume.get(stock.id, 0))
         stock.avg_volume = int(stock.avg_volume * 0.9 + stock.volume * 0.1)
         stock.prev_daily_ret = real_return

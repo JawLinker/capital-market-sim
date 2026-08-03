@@ -227,6 +227,20 @@ export default function MarketView() {
                         {t("market.intraday")} {money(intradayPrice)}
                       </span>
                     ) : null}
+                    {Math.abs(quote.player_impact || 0) > 0.0001 ? (
+                      <span
+                        className={`rounded-[3px] border px-1.5 py-0.5 text-[10px] font-semibold tabular ${
+                          quote.player_impact > 0
+                            ? "border-mint/40 bg-mint/10 text-mint"
+                            : "border-risk/40 bg-risk/10 text-risk"
+                        }`}
+                        title={t("market.playerImpact")}
+                      >
+                        {t("market.playerImpact")}{" "}
+                        {quote.player_impact > 0 ? "+" : ""}
+                        {(quote.player_impact * 100).toFixed(2)}%
+                      </span>
+                    ) : null}
                   </div>
                   <p className={`text-xs font-semibold tabular ${toneClass(quote.change_pct)}`}>
                     {quote.change_pct > 0 ? "+" : ""}{quote.change_pct.toFixed(2)}% {t("market.today")}

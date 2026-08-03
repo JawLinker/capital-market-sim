@@ -153,7 +153,9 @@ def post_advance(
                     summary=(
                         event["prose_zh"] if get_lang(request) == "zh" else event["prose_en"]
                     ),
-                    category="market",
+                    category=(
+                        "positive" if event["sentiment_delta"] >= 0 else "negative"
+                    ),
                     scope="market",
                     kind="blackswan",
                     impact_pct=round(event["sentiment_delta"] * 100, 2),

@@ -58,7 +58,7 @@ def process_dividends(db: Session) -> list:
                 day=state.day,
                 headline="{name} pays cash dividend",
                 summary="dividend",
-                category="stock",
+                category="positive",
                 scope="stock",
                 kind="dividend",
                 stock_id=stock.id,

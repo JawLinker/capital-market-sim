@@ -68,6 +68,7 @@ def _quote_dict(
         "next_earnings_day": stock.next_earnings_day,
         "last_surprise_pct": round(stock.last_surprise_pct, 2),
         "bot_net_flow": round(bot_net_flow, 2),
+        "player_impact": round(stock.player_impact or 0.0, 6),
         "bid": stock.bid,
         "ask": stock.ask,
         "bid_depth": stock.bid_depth,
