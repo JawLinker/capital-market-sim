@@ -82,6 +82,17 @@ class Player(Base):
     created_at = Column(String(32), default=utc_now)
 
 
+class StorylineProgress(Base):
+    __tablename__ = "storyline_progress"
+    __table_args__ = (UniqueConstraint("player_id", "npc_key", name="uq_storyline_player"),)
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False, index=True)
+    npc_key = Column(String(32), nullable=False)
+    chapter = Column(Integer, nullable=False, default=0)
+    completed_at = Column(String(32), default=utc_now)
+
+
 class Holding(Base):
     __tablename__ = "holdings"
     __table_args__ = (UniqueConstraint("player_id", "stock_id", name="uq_holding"),)

@@ -17,4 +17,7 @@ def test_leaderboard_contains_player_and_rivals(client):
     assert "rival" in kinds
     assert "benchmark" in kinds
     assert data["total_entries"] == 42
+    assert "season" in data
+    current = next(entry for entry in data["entries"] if entry.get("is_current"))
+    assert "medal" in current
     assert 1 <= data["player_rank"] <= 38

@@ -35,6 +35,9 @@ Every price move is real history, replayed day by day.
   daily, and legend NPCs send personalized commissions tied to the market cycle
 - **Black swan events**: advancing day by day can trigger era-flavored market
   shocks with cinematic popups that shift market sentiment
+- **Season medals, NPC storylines, and replay**: weekly leaderboard seasons
+  award medals, four legend NPCs run five-lesson storyline quests, and a
+  replay report grades every trading decision
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

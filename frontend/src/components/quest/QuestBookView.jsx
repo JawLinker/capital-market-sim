@@ -55,13 +55,20 @@ export default function QuestBookView() {
   const [book, setBook] = useState({ arcs: [] });
   const [daily, setDaily] = useState(null);
   const [commission, setCommission] = useState(null);
+  const [storylines, setStorylines] = useState([]);
 
   useEffect(() => {
-    Promise.all([api.getChronicleBook(), api.getDailyQuest(), api.getCommission()])
-      .then(([bookData, dailyData, commissionData]) => {
+    Promise.all([
+      api.getChronicleBook(),
+      api.getDailyQuest(),
+      api.getCommission(),
+      api.getStorylines(),
+    ])
+      .then(([bookData, dailyData, commissionData, storylineData]) => {
         setBook(bookData || { arcs: [] });
         setDaily(dailyData);
         setCommission(commissionData);
+        setStorylines(storylineData?.storylines || []);
       })
       .catch(() => {});
   }, []);
@@ -197,6 +204,73 @@ export default function QuestBookView() {
           )}
         </ArchiveCard>
       </div>
+
+      <section>
+        <div className="mb-3 flex items-center gap-2">
+          <MessagesSquare size={16} className="text-brass" />
+          <h2 className="font-display text-lg font-bold text-parch-100">
+            {t("quest.storylines")}
+          </h2>
+          <p className="text-xs text-parch-500">{t("quest.storylinesDetail")}</p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          {storylines.map((line) => {
+            const current = line.chapters.find((chapter) => chapter.status === "current");
+            return (
+              <article key={line.key} className="panel overflow-hidden">
+                <div className="flex items-center gap-3 border-b border-ink-600/70 px-4 py-3">
+                  <Avatar seed={line.name} iconKey={line.icon} size={34} />
+                  <div className="min-w-0">
+                    <h3 className="font-display text-sm font-bold text-parch-100">{line.name}</h3>
+                    <p className="text-[11px] text-parch-500">
+                      {line.completed
+                        ? t("chronicle.met")
+                        : `${line.current_chapter}/${line.chapters.length}`}
+                    </p>
+                  </div>
+                  {line.completed ? (
+                    <Badge className="ml-auto border-mint/40 bg-mint/10 text-mint">
+                      {t("quest.completed")}
+                    </Badge>
+                  ) : null}
+                </div>
+                <div className="space-y-3 p-4">
+                  <ol className="flex flex-wrap items-center gap-1.5">
+                    {line.chapters.map((chapter) => (
+                      <li
+                        key={chapter.id}
+                        title={chapter.title}
+                        className={`rounded-[3px] border px-2 py-1 text-[10px] font-semibold ${
+                          chapter.status === "current"
+                            ? "border-risk/50 bg-risk/10 text-risk"
+                            : chapter.status === "passed"
+                              ? "border-brass/35 bg-brass/5 text-brass"
+                              : "border-ink-600/80 text-parch-600"
+                        }`}
+                      >
+                        {chapter.index}
+                      </li>
+                    ))}
+                  </ol>
+                  {current ? (
+                    <>
+                      <h4 className="text-sm font-semibold text-parch-100">{current.title}</h4>
+                      <p className="text-xs italic leading-5 text-parch-500">{current.prose}</p>
+                      <ObjectiveBlock objective={current.objective} t={t} />
+                      <p className="flex items-center gap-1.5 text-[11px] text-parch-500">
+                        <Trophy size={11} className="text-gold" />
+                        {t("quest.reward")}: {current.reward}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-xs text-parch-600">{t("quest.locked")}</p>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
       <section className="space-y-4">
         {book.arcs.map((arc) => {

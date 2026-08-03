@@ -7,6 +7,7 @@ import AdvisorView from "./components/advisor/AdvisorView.jsx";
 import AchievementsView from "./components/gamification/AchievementsView.jsx";
 import StoriesArchiveView from "./components/archive/StoriesArchiveView.jsx";
 import QuestBookView from "./components/quest/QuestBookView.jsx";
+import ReplayView from "./components/replay/ReplayView.jsx";
 import LoginView from "./components/auth/LoginView.jsx";
 
 const VIEWS = {
@@ -17,6 +18,7 @@ const VIEWS = {
   achievements: AchievementsView,
   archive: StoriesArchiveView,
   quests: QuestBookView,
+  replay: ReplayView,
 };
 
 export default function App() {

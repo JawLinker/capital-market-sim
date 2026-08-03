@@ -150,13 +150,18 @@ export default function AchievementsView() {
           title={t("achievements.leaderboard")}
           detail={t("achievements.leaderboardDetail")}
           right={
-            <Badge className="border-ink-500/50 text-parch-300">
-              {t("achievements.winRate", {
-                losses: leaderboard?.losses,
-                flat: leaderboard?.flat,
-                wins: leaderboard?.wins,
-              })}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge className="border-gold/40 bg-gold/10 text-gold">
+                {leaderboard?.season?.label}
+              </Badge>
+              <Badge className="border-ink-500/50 text-parch-300">
+                {t("achievements.winRate", {
+                  losses: leaderboard?.losses,
+                  flat: leaderboard?.flat,
+                  wins: leaderboard?.wins,
+                })}
+              </Badge>
+            </div>
           }
         />
         <div className="overflow-x-auto">
@@ -200,6 +205,21 @@ export default function AchievementsView() {
                       {entry.name}
                       {entry.kind === "player" && entry.is_current ? (
                         <Badge className="border-sky/40 bg-sky/10 text-sky">{t("achievements.you")}</Badge>
+                      ) : null}
+                      {entry.kind === "player" && entry.is_current && entry.medal ? (
+                        <Badge
+                          className={
+                            entry.medal === "gold"
+                              ? "border-gold/40 bg-gold/10 text-gold"
+                              : entry.medal === "silver"
+                                ? "border-parch-400/40 bg-parch-400/10 text-parch-200"
+                                : "border-brass/40 bg-brass/10 text-brass"
+                          }
+                        >
+                          {t(
+                            `season.medal${entry.medal.charAt(0).toUpperCase()}${entry.medal.slice(1)}`
+                          )}
+                        </Badge>
                       ) : entry.kind === "benchmark" ? (
                         <Badge className="border-ink-500/50 text-parch-500">{t("achievements.index")}</Badge>
                       ) : null}

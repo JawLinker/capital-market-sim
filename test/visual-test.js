@@ -160,8 +160,13 @@ async function canvasCheck(page, label) {
   await page.getByTitle("Quest Book").click();
   await page.waitForSelector("text=Daily Challenge", { timeout: 15000 });
   await page.waitForSelector("text=Cash Sentinel", { timeout: 15000 });
+  await page.waitForSelector("text=Lesson 1: Read the Book", { timeout: 15000 });
   await page.waitForTimeout(600);
   await shot(page, "20-quest-book.png");
+  await page.getByTitle("Replay Report").click();
+  await page.waitForSelector("text=Total trades", { timeout: 15000 });
+  await page.waitForTimeout(600);
+  await shot(page, "21-replay.png");
   await page.getByTitle("Milestones").click();
   await page.waitForSelector("text=Investment milestones", { timeout: 15000 });
 

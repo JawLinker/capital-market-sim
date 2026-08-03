@@ -5,6 +5,7 @@ import {
   CandlestickChart,
   FastForward,
   Globe,
+  History,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -33,6 +34,7 @@ const NAV_ITEMS = [
   { key: "achievements", icon: Trophy },
   { key: "archive", icon: Archive },
   { key: "quests", icon: ListChecks },
+  { key: "replay", icon: History },
 ];
 
 function Sidebar() {
