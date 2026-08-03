@@ -88,6 +88,7 @@ function TopBar() {
     authPlayer,
     logout,
     openStory,
+    chronicle,
   } = useApp();
   const [fastDays, setFastDays] = useState(30);
   const market = gameState?.market;
@@ -110,7 +111,7 @@ function TopBar() {
           <p className="truncate font-display text-sm font-bold text-parch-100">
             {market?.date ? `${era.label} · ${market.date}` : era.label}
           </p>
-          <p className="text-[10px] uppercase tracking-[0.14em] text-parch-600">
+          <p className="whitespace-nowrap text-[10px] uppercase tracking-[0.14em] text-parch-600">
             {t("topbar.tradingDay", { day: market?.day || 0 })}
           </p>
         </div>
@@ -145,15 +146,6 @@ function TopBar() {
             <p className="text-[10px] uppercase tracking-wide text-parch-500">{t("topbar.rate")}</p>
             <p className="text-sm font-semibold tabular text-parch-100">
               {market?.policy_rate?.toFixed(2)}%
-            </p>
-          </div>
-          <div className="hidden border-l border-ink-600 pl-3 xl:block">
-            <p className="text-[10px] uppercase tracking-wide text-parch-500">{t("topbar.index")}</p>
-            <p className="text-sm font-semibold tabular text-parch-100">
-              {market?.shanghai_index?.toFixed(2)}
-              <span className={`ml-1.5 text-xs ${toneClass(market?.shanghai_change_pct || 0)}`}>
-                {percent(market?.shanghai_change_pct || 0)}
-              </span>
             </p>
           </div>
         </div>
@@ -208,6 +200,14 @@ function TopBar() {
             <span className="max-w-28 truncate text-xs font-semibold text-parch-200">
               {authPlayer.username}
             </span>
+            {chronicle?.title ? (
+              <Badge
+                className="hidden rounded bg-gold/15 px-1.5 py-0.5 text-[10px] font-bold text-gold lg:inline-flex"
+                title={chronicle.title.label}
+              >
+                {chronicle.title.label}
+              </Badge>
+            ) : null}
             {isHost ? (
               <Badge className="rounded bg-brass/15 px-1.5 py-0.5 text-[10px] font-bold text-brass">
                 {t("topbar.host")}

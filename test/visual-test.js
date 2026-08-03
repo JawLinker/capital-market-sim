@@ -154,6 +154,7 @@ async function canvasCheck(page, label) {
   await page.waitForTimeout(600);
   await shot(page, "19-chronicle-book.png");
   await page.getByTitle("Quest Book").click();
+  await page.waitForSelector("text=Daily Challenge", { timeout: 15000 });
   await page.waitForSelector("text=Cash Sentinel", { timeout: 15000 });
   await page.waitForTimeout(600);
   await shot(page, "20-quest-book.png");

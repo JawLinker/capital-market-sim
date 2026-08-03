@@ -1,24 +1,68 @@
 import { useEffect, useState } from "react";
 import {
+  CalendarDays,
   CheckCircle2,
   Lock,
+  MessagesSquare,
   Target,
   Trophy,
 } from "lucide-react";
 
 import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
+import Avatar from "../Avatar.jsx";
 import { ArchiveCard, MuseumHeader } from "../museum.jsx";
 import { Badge } from "../ui.jsx";
+
+function ObjectiveBlock({ objective, t }) {
+  if (!objective) return null;
+  return (
+    <div className="rounded-[3px] border border-ink-600/70 bg-ink-900/60 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-parch-600">
+          {t("chronicle.objective")}
+        </p>
+        <span
+          className={`rounded-[3px] border px-2 py-0.5 text-[10px] font-bold ${
+            objective.met
+              ? "border-mint/40 bg-mint/10 text-mint"
+              : "border-brass/40 bg-brass/10 text-brass"
+          }`}
+        >
+          {objective.met ? t("chronicle.met") : t("chronicle.notMet")}
+        </span>
+      </div>
+      <p className="mt-2 text-xs text-parch-300">{objective.label}</p>
+      <p className="mt-1 text-xs tabular text-parch-500">
+        {objective.current.toLocaleString()} / {objective.target.toLocaleString()}
+      </p>
+      {objective.target > 0 ? (
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-600">
+          <div
+            className="h-full rounded-full bg-brass"
+            style={{
+              width: `${Math.min(100, (objective.current / objective.target) * 100)}%`,
+            }}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export default function QuestBookView() {
   const { chronicle, t } = useApp();
   const [book, setBook] = useState({ arcs: [] });
+  const [daily, setDaily] = useState(null);
+  const [commission, setCommission] = useState(null);
 
   useEffect(() => {
-    api
-      .getChronicleBook()
-      .then((data) => setBook(data || { arcs: [] }))
+    Promise.all([api.getChronicleBook(), api.getDailyQuest(), api.getCommission()])
+      .then(([bookData, dailyData, commissionData]) => {
+        setBook(bookData || { arcs: [] });
+        setDaily(dailyData);
+        setCommission(commissionData);
+      })
       .catch(() => {});
   }, []);
 
@@ -67,42 +111,9 @@ export default function QuestBookView() {
           <p className="mt-2 border-l-2 border-brass/40 pl-3 text-sm italic leading-6 text-parch-500">
             {currentBeat.prose}
           </p>
-          {currentBeat.objective ? (
-            <div className="mt-4 rounded-[3px] border border-ink-600/70 bg-ink-900/60 p-3">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-parch-600">
-                  {t("chronicle.objective")}
-                </p>
-                <span
-                  className={`rounded-[3px] border px-2 py-0.5 text-[10px] font-bold ${
-                    currentBeat.objective.met
-                      ? "border-mint/40 bg-mint/10 text-mint"
-                      : "border-brass/40 bg-brass/10 text-brass"
-                  }`}
-                >
-                  {currentBeat.objective.met ? t("chronicle.met") : t("chronicle.notMet")}
-                </span>
-              </div>
-              <p className="mt-2 text-xs text-parch-300">{currentBeat.objective.label}</p>
-              <p className="mt-1 text-xs tabular text-parch-500">
-                {currentBeat.objective.current.toLocaleString()} /{" "}
-                {currentBeat.objective.target.toLocaleString()}
-              </p>
-              {currentBeat.objective.target > 0 ? (
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-600">
-                  <div
-                    className="h-full rounded-full bg-brass"
-                    style={{
-                      width: `${Math.min(
-                        100,
-                        (currentBeat.objective.current / currentBeat.objective.target) * 100
-                      )}%`,
-                    }}
-                  />
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+          <div className="mt-4">
+            <ObjectiveBlock objective={currentBeat.objective} t={t} />
+          </div>
           <div className="mt-4 flex items-center gap-2 rounded-[3px] border border-gold/40 bg-gold/10 px-3 py-2.5">
             <Trophy size={14} className="text-gold" />
             <p className="text-xs text-parch-300">
@@ -112,6 +123,80 @@ export default function QuestBookView() {
           </div>
         </ArchiveCard>
       ) : null}
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <ArchiveCard
+          header={
+            <div>
+              <h2 className="flex items-center gap-2 font-display text-[15px] font-semibold text-parch-100">
+                <CalendarDays size={15} className="text-brass" />
+                {t("quest.daily")}
+              </h2>
+              <p className="mt-0.5 text-xs text-parch-500">{t("quest.dailyDetail")}</p>
+            </div>
+          }
+        >
+          {daily ? (
+            <>
+              <p className="font-mono text-[11px] tabular text-parch-600">{daily.date}</p>
+              <p className="mt-2 text-sm leading-6 text-parch-400">{daily.description}</p>
+              <div className="mt-3">
+                <ObjectiveBlock objective={daily.objective} t={t} />
+              </div>
+              <div className="mt-3 flex items-center gap-2 rounded-[3px] border border-gold/40 bg-gold/10 px-3 py-2.5">
+                <Trophy size={14} className="text-gold" />
+                <p className="text-xs text-parch-300">
+                  {t("quest.reward")}:{" "}
+                  <span className="font-semibold text-gold">{daily.reward?.label}</span>
+                </p>
+              </div>
+            </>
+          ) : (
+            <p className="text-xs text-parch-600">…</p>
+          )}
+        </ArchiveCard>
+
+        <ArchiveCard
+          header={
+            <div>
+              <h2 className="flex items-center gap-2 font-display text-[15px] font-semibold text-parch-100">
+                <MessagesSquare size={15} className="text-brass" />
+                {t("quest.commission")}
+              </h2>
+              <p className="mt-0.5 text-xs text-parch-500">{t("quest.commissionDetail")}</p>
+            </div>
+          }
+        >
+          {commission ? (
+            <>
+              <div className="flex items-center gap-3">
+                <Avatar seed={commission.npc?.name} iconKey={commission.npc?.icon} size={34} />
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-parch-600">
+                    {t("quest.from")}
+                  </p>
+                  <p className="font-display text-sm font-bold text-parch-100">
+                    {commission.npc?.name}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-parch-400">{commission.description}</p>
+              <div className="mt-3">
+                <ObjectiveBlock objective={commission.objective} t={t} />
+              </div>
+              <div className="mt-3 flex items-center gap-2 rounded-[3px] border border-gold/40 bg-gold/10 px-3 py-2.5">
+                <Trophy size={14} className="text-gold" />
+                <p className="text-xs text-parch-300">
+                  {t("quest.reward")}:{" "}
+                  <span className="font-semibold text-gold">{commission.reward?.label}</span>
+                </p>
+              </div>
+            </>
+          ) : (
+            <p className="text-xs text-parch-600">…</p>
+          )}
+        </ArchiveCard>
+      </div>
 
       <section className="space-y-4">
         {book.arcs.map((arc) => {

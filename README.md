@@ -31,6 +31,8 @@ Every price move is real history, replayed day by day.
   icon-and-color avatar, generated locally with no image assets
 - **Quest book**: every chronicle chapter is a formal task with a reward,
   tracked in a dedicated quest page that shows the full era task tree
+- **Daily challenges & NPC commissions**: a date-seeded objective rotates
+  daily, and legend NPCs send personalized commissions tied to the market cycle
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

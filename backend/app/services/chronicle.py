@@ -388,7 +388,7 @@ def _tech_holdings(db: Session, player: models.Player):
     )
 
 
-def _evaluate_objective(db: Session, player: models.Player, objective: dict, lang: str) -> dict:
+def evaluate_objective(db: Session, player: models.Player, objective: dict, lang: str) -> dict:
     kind = objective["type"]
     target = objective["target"]
     current = 0.0
@@ -448,7 +448,7 @@ def build_chronicle(db: Session, player: models.Player, date: str, lang: str) ->
             status = "locked"
         objective = None
         if status == "current":
-            result = _evaluate_objective(db, player, beat["objective"], lang)
+            result = evaluate_objective(db, player, beat["objective"], lang)
             objective = {
                 "type": beat["objective"]["type"],
                 "label": result["label"],
@@ -492,6 +492,7 @@ def build_chronicle(db: Session, player: models.Player, date: str, lang: str) ->
         "stamp": CHRONICLE_STAMP["zh" if zh else "en"],
         "current_beat": current_beat,
         "completed": completed,
+        "title": _player_title(arc, date, zh),
         "grade": {
             "key": grade_key,
             "label": grade_label,
@@ -521,7 +522,7 @@ def arc_book(db: Session, player: models.Player, date: str, lang: str) -> dict:
                 status = "locked"
             objective = None
             if status == "current":
-                result = _evaluate_objective(db, player, beat["objective"], lang)
+                result = evaluate_objective(db, player, beat["objective"], lang)
                 objective = {
                     "type": beat["objective"]["type"],
                     "label": result["label"],
@@ -561,4 +562,26 @@ def _reward_for(beat_id: str, lang: str) -> dict:
     return {
         "code": beat_id,
         "label": label[0] if zh else label[1],
+    }
+
+
+def _player_title(arc: dict, date: str, zh: bool) -> dict:
+    passed_rewards = [
+        BEAT_REWARDS.get(beat["id"])
+        for beat in arc["beats"]
+        if beat["date"] <= date
+    ]
+    last_reward = next((item for item in reversed(passed_rewards) if item), None)
+    if last_reward is None:
+        return {
+            "code": "new_arrival",
+            "label": "新入场者" if zh else "New Arrival",
+        }
+    title_code = next(
+        (beat_id for beat_id, reward in BEAT_REWARDS.items() if reward == last_reward),
+        "new_arrival",
+    )
+    return {
+        "code": title_code,
+        "label": last_reward[0] if zh else last_reward[1],
     }

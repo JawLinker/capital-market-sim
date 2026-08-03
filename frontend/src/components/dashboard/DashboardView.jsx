@@ -103,7 +103,9 @@ export default function DashboardView() {
               </h2>
               <p className="mt-0.5 text-xs text-parch-500">{chronicle?.summary || ""}</p>
             </div>
-            <Badge className="border-brass/40 bg-brass/10 text-brass">{chronicle?.title}</Badge>
+            <Badge className="border-brass/40 bg-brass/10 text-brass">
+              {chronicle?.title?.label}
+            </Badge>
           </div>
         }
       >
