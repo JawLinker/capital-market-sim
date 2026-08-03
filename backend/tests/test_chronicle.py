@@ -12,6 +12,8 @@ def test_chronicle_returns_current_arc(client):
     assert current["objective"] is not None
     assert "current" in current["objective"]
     assert "met" in current["objective"]
+    assert current["reward"]["code"] == current["id"]
+    assert current["reward"]["label"]
 
 
 def test_chronicle_advances_to_next_beat(client):

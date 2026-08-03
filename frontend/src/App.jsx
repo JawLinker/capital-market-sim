@@ -6,6 +6,7 @@ import PortfolioView from "./components/portfolio/PortfolioView.jsx";
 import AdvisorView from "./components/advisor/AdvisorView.jsx";
 import AchievementsView from "./components/gamification/AchievementsView.jsx";
 import StoriesArchiveView from "./components/archive/StoriesArchiveView.jsx";
+import QuestBookView from "./components/quest/QuestBookView.jsx";
 import LoginView from "./components/auth/LoginView.jsx";
 
 const VIEWS = {
@@ -15,6 +16,7 @@ const VIEWS = {
   advisor: AdvisorView,
   achievements: AchievementsView,
   archive: StoriesArchiveView,
+  quests: QuestBookView,
 };
 
 export default function App() {

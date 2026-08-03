@@ -6,6 +6,7 @@ import {
   FastForward,
   Globe,
   LayoutDashboard,
+  ListChecks,
   LogOut,
   MessageCircleMore,
   Play,
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { key: "advisor", icon: Sparkles },
   { key: "achievements", icon: Trophy },
   { key: "archive", icon: Archive },
+  { key: "quests", icon: ListChecks },
 ];
 
 function Sidebar() {

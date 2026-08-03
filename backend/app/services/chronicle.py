@@ -11,6 +11,28 @@ from .. import models
 
 CHRONICLE_STAMP = {"zh": "时代纪事", "en": "ERA CHRONICLE"}
 
+BEAT_REWARDS = {
+    "2021-b1": ("现金卫士", "Cash Sentinel"),
+    "2021-b2": ("新能源骑手", "New Energy Rider"),
+    "2021-b3": ("限电幸存者", "Blackout Survivor"),
+    "2022-b1": ("冬眠大师", "Hibernation Master"),
+    "2022-b2": ("冰点守望者", "Freeze-Point Watcher"),
+    "2022-b3": ("黎明前夜客", "Pre-Dawn Rider"),
+    "2023-b1": ("哑铃举重员", "Barbell Lifter"),
+    "2023-b2": ("AI 先声", "AI Whisperer"),
+    "2023-b3": ("深水潜行者", "Deep-Water Diver"),
+    "2024-b1": ("算力先锋", "Compute Pioneer"),
+    "2024-b2": ("玄学研究员", "Mysticism Researcher"),
+    "2024-b3": ("政策传导者", "Policy Conductor"),
+    "2025-b1": ("修复师", "The Repairer"),
+    "2025-b2": ("慢牛骑手", "Slow-Bull Rider"),
+    "2025-b3": ("年末守门人", "Year-End Guardian"),
+    "2026-b1": ("算力订单猎手", "Order Hunter"),
+    "2026-b2": ("连板见证人", "Limit-Up Witness"),
+    "2026-b3": ("兑现艺术家", "Profit-Taking Artist"),
+    "2026-b4": ("浪潮复盘者", "Wave Reviewer"),
+}
+
 ARCS = [
     {
         "key": "2021",
@@ -442,6 +464,7 @@ def build_chronicle(db: Session, player: models.Player, date: str, lang: str) ->
                 "status": status,
                 "title": beat["title_zh"] if zh else beat["title_en"],
                 "prose": beat["prose_zh"] if zh else beat["prose_en"],
+                "reward": _reward_for(beat["id"], lang),
                 "objective": objective,
             }
         )
@@ -514,6 +537,7 @@ def arc_book(db: Session, player: models.Player, date: str, lang: str) -> dict:
                     "status": status,
                     "title": beat["title_zh"] if zh else beat["title_en"],
                     "prose": beat["prose_zh"] if zh else beat["prose_en"],
+                    "reward": _reward_for(beat["id"], lang),
                     "objective": objective,
                 }
             )
@@ -529,3 +553,12 @@ def arc_book(db: Session, player: models.Player, date: str, lang: str) -> dict:
             }
         )
     return {"arcs": arcs}
+
+
+def _reward_for(beat_id: str, lang: str) -> dict:
+    zh = lang == "zh"
+    label = BEAT_REWARDS.get(beat_id, ("章节徽章", "Chapter Badge"))
+    return {
+        "code": beat_id,
+        "label": label[0] if zh else label[1],
+    }
