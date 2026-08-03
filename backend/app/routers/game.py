@@ -12,7 +12,12 @@ from ..services import portfolio
 from ..services.gamification import check_all
 from ..services.market_engine import advance_day
 from ..i18n import get_lang
-from ..services.blackswan import localize_black_swan, pick_black_swan
+from ..services.blackswan import (
+    black_swan_options,
+    localize_black_swan,
+    pick_black_swan,
+)
+from ..services.decisions import create_black_swan_decision
 from ..services.duels import settle_duels
 from ..services.pending_orders import execute_pending_orders
 
@@ -116,7 +121,25 @@ def post_advance(
                 )
             )
             db.commit()
-            black_swan = localize_black_swan({**event, "date": state.date}, get_lang(request))
+            lang = get_lang(request)
+            black_swan = localize_black_swan({**event, "date": state.date}, lang)
+            decision = create_black_swan_decision(
+                db,
+                player,
+                event,
+                lang,
+                result["day"],
+            )
+            db.commit()
+            black_swan["decision_id"] = decision.id
+            black_swan["options"] = [
+                {
+                    "key": option["key"],
+                    "label": option["label"],
+                    "detail": option["detail"],
+                }
+                for option in black_swan_options(lang)
+            ]
     unlocked = check_all(db, player)
     summary = portfolio.portfolio_summary(db, player)
     return {
@@ -155,6 +178,7 @@ def post_reset(request: Request, db: Session = Depends(get_db)):
             models.StorylineProgress,
             models.PendingOrder,
             models.Duel,
+            models.Decision,
         ):
             db.query(table).filter(table.player_id.in_(guest_ids)).delete(
                 synchronize_session=False
@@ -168,6 +192,7 @@ def post_reset(request: Request, db: Session = Depends(get_db)):
         models.Holding,
         models.PendingOrder,
         models.Duel,
+        models.Decision,
     ):
         db.query(table).filter(table.player_id == player.id).delete(
             synchronize_session=False

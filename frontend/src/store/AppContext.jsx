@@ -244,6 +244,48 @@ export function AppProvider({ children }) {
       return next;
     });
   }, []);
+  const resolveBlackSwanOption = useCallback(
+    async (option) => {
+      if (!blackSwan?.decision_id) return;
+      try {
+        const result = await api.resolveDecision(blackSwan.decision_id, option.key);
+        if (result.cash_delta > 0) sounds.money();
+        else if (result.cash_delta < 0) sounds.loss();
+        addToast(
+          result.cash_delta > 0 ? "success" : result.cash_delta < 0 ? "error" : "achievement",
+          t("decision.applied"),
+          option.detail
+        );
+        setBlackSwan(null);
+        await refreshAll();
+      } catch (error) {
+        addToast("error", t("toast.orderRejected"), error.message);
+      }
+    },
+    [blackSwan, refreshAll, addToast, t]
+  );
+  const applyEraBonus = useCallback(
+    async (optionKey) => {
+      if (!eraTransition?.grade?.key) return;
+      try {
+        const result = await api.eraBonus(eraTransition.grade.key, optionKey);
+        if (result.cash_delta > 0) sounds.money();
+        else if (result.sentiment_delta > 0) sounds.achievement();
+        addToast(
+          result.cash_delta > 0 ? "success" : "achievement",
+          t("decision.applied"),
+          result.cash_delta > 0
+            ? `${t("decision.cash")} +${result.cash_delta}`
+            : `${t("decision.sentiment")} +${Math.round(result.sentiment_delta * 100)}%`
+        );
+        setEraTransition(null);
+        await refreshAll();
+      } catch (error) {
+        addToast("error", t("toast.orderRejected"), error.message);
+      }
+    },
+    [eraTransition, refreshAll, addToast, t]
+  );
 
   const login = useCallback(
     async (username, password) => {
@@ -341,6 +383,11 @@ export function AppProvider({ children }) {
         }
       });
       sounds.advance();
+      if ((result.portfolio?.summary?.daily_pnl || 0) > 0) {
+        sounds.money();
+      } else if ((result.portfolio?.summary?.daily_pnl || 0) < 0) {
+        sounds.loss();
+      }
       addToast("success", t("toast.advanced", { days: result.days_advanced }));
       announceUnlocks(result.unlocked_achievements);
       await Promise.all([refreshAll(), loadMarket()]);
@@ -365,8 +412,13 @@ export function AppProvider({ children }) {
       try {
         const result = await api.trade(action, ticker, shares);
         const verb = t(action === "buy" ? "toast.bought" : "toast.sold");
-        if (action === "buy") sounds.buy();
-        else sounds.sell();
+        if (action === "buy") {
+          sounds.buy();
+        } else if (result.trade?.realized_pnl > 0) {
+          sounds.money();
+        } else {
+          sounds.sell();
+        }
         addToast(
           "success",
           verb
@@ -458,6 +510,8 @@ export function AppProvider({ children }) {
       closeBlackSwan,
       muted,
       toggleMute,
+      resolveBlackSwanOption,
+      applyEraBonus,
       openStory,
       nextStory,
       closeStory,
@@ -505,6 +559,8 @@ export function AppProvider({ children }) {
       closeBlackSwan,
       muted,
       toggleMute,
+      resolveBlackSwanOption,
+      applyEraBonus,
       openStory,
       nextStory,
       closeStory,

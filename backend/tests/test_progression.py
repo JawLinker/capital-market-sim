@@ -66,3 +66,68 @@ def test_reset_keeps_host_achievements(client):
     assert "first_trade" in unlocked
     state = client.get("/api/state").json()
     assert state["portfolio"]["cash"] == 100000
+
+
+def test_black_swan_decision_resolves(client):
+    from app import models
+    from app.database import SessionLocal
+    from app.services.decisions import create_black_swan_decision
+
+    db = SessionLocal()
+    player = db.query(models.Player).first()
+    decision = create_black_swan_decision(
+        db,
+        player,
+        {"title_zh": "测试", "title_en": "Test"},
+        "en",
+        0,
+    )
+    db.commit()
+    decision_id = decision.id
+    db.close()
+
+    response = client.post(
+        f"/api/decisions/{decision_id}/resolve",
+        json={"option_key": "take_profit"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["cash_delta"] == 1000
+    assert body["sentiment_delta"] == -0.02
+
+
+def test_era_bonus_applies(client):
+    response = client.post(
+        "/api/decisions/era-bonus",
+        json={"grade_key": "gold", "option_key": "cash_large"},
+    )
+    assert response.status_code == 200
+    assert response.json()["cash_delta"] == 10000
+    state = client.get("/api/state").json()
+    assert state["portfolio"]["cash"] == 110000
+
+
+def test_black_swan_decision_rejects_bad_option(client):
+    from app import models
+    from app.database import SessionLocal
+    from app.services.decisions import create_black_swan_decision
+
+    db = SessionLocal()
+    player = db.query(models.Player).first()
+    decision = create_black_swan_decision(
+        db,
+        player,
+        {"title_zh": "测试", "title_en": "Test"},
+        "en",
+        0,
+    )
+    db.commit()
+    decision_id = decision.id
+    db.close()
+    assert (
+        client.post(
+            f"/api/decisions/{decision_id}/resolve",
+            json={"option_key": "nope"},
+        ).status_code
+        == 404
+    )

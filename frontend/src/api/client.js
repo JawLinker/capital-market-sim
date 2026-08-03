@@ -83,6 +83,16 @@ export const api = {
       body: JSON.stringify({ rival_id: rivalId, stake, days }),
     }),
   getDuels: () => request("/api/duels"),
+  resolveDecision: (decisionId, optionKey) =>
+    request(`/api/decisions/${decisionId}/resolve`, {
+      method: "POST",
+      body: JSON.stringify({ option_key: optionKey }),
+    }),
+  eraBonus: (gradeKey, optionKey) =>
+    request("/api/decisions/era-bonus", {
+      method: "POST",
+      body: JSON.stringify({ grade_key: gradeKey, option_key: optionKey }),
+    }),
   getPortfolio: () => request("/api/portfolio"),
   getAdvisorReport: () => request("/api/advisor/portfolio"),
   advisorChat: (message) =>

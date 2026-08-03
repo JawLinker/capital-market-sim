@@ -133,6 +133,18 @@ class Duel(Base):
     created_at = Column(String(32), default=utc_now)
 
 
+class Decision(Base):
+    __tablename__ = "decisions"
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False, index=True)
+    kind = Column(String(24), nullable=False)
+    payload = Column(Text, nullable=False, default="{}")
+    status = Column(String(12), nullable=False, default="open")
+    created_day = Column(Integer, nullable=False)
+    created_at = Column(String(32), default=utc_now)
+
+
 class Holding(Base):
     __tablename__ = "holdings"
     __table_args__ = (UniqueConstraint("player_id", "stock_id", name="uq_holding"),)

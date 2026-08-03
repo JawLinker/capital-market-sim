@@ -47,6 +47,9 @@ Every price move is real history, replayed day by day.
 - **Game-feel controls**: Space advances the day, B/P/Q/R jump between pages,
   M toggles sound, one-click 1-lot orders, and stat values tick when they
   change
+- **Player decisions**: black swans and era transitions now ask you to choose,
+  with cash and sentiment consequences, and coin sounds celebrate profitable
+  moments
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

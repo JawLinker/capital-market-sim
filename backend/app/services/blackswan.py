@@ -131,3 +131,27 @@ def localize_black_swan(event: dict, lang: str) -> dict:
         "prose": event["prose_zh"] if zh else event["prose_en"],
         "sentiment_delta": event["sentiment_delta"],
     }
+
+
+def black_swan_options(lang: str) -> list:
+    zh = lang == "zh"
+    return [
+        {
+            "key": "buy_dip",
+            "label": "抢反弹" if zh else "Buy the dip",
+            "detail": "现金 -1,500 · 情绪 +3%" if zh else "Cash -1,500 · Sentiment +3%",
+            "effect": {"cash": -1500, "sentiment": 0.03},
+        },
+        {
+            "key": "hold",
+            "label": "按兵不动" if zh else "Stand pat",
+            "detail": "无效果" if zh else "No effect",
+            "effect": {"cash": 0, "sentiment": 0},
+        },
+        {
+            "key": "take_profit",
+            "label": "落袋为安" if zh else "Take profit",
+            "detail": "现金 +1,000 · 情绪 -2%" if zh else "Cash +1,000 · Sentiment -2%",
+            "effect": {"cash": 1000, "sentiment": -0.02},
+        },
+    ]

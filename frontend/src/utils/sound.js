@@ -53,4 +53,13 @@ export const sounds = {
     tone(330, 0.2, "triangle");
     tone(262, 0.25, "triangle", 0.03, 0.15);
   },
+  money() {
+    tone(1318, 0.08, "square", 0.03);
+    tone(1760, 0.12, "square", 0.03, 0.06);
+    tone(2637, 0.18, "triangle", 0.04, 0.12);
+  },
+  loss() {
+    tone(220, 0.16, "triangle");
+    tone(147, 0.22, "triangle", 0.03, 0.1);
+  },
 };

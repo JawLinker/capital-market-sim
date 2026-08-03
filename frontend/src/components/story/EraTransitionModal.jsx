@@ -26,7 +26,7 @@ const GRADE_STYLE = {
 };
 
 export default function EraTransitionModal() {
-  const { eraTransition, closeEraTransition, t } = useApp();
+  const { eraTransition, closeEraTransition, applyEraBonus, t } = useApp();
   if (!eraTransition) return null;
   const grade = eraTransition.grade || { key: "bronze", label: t("chronicle.gradeBronze") };
   const style = GRADE_STYLE[grade.key] || GRADE_STYLE.bronze;
@@ -56,6 +56,21 @@ export default function EraTransitionModal() {
             <span className="h-px flex-1 bg-current opacity-30" />
           </div>
           <p className="mt-4 text-sm leading-6 text-parch-400">{t(flavorKey)}</p>
+          <div className="mx-auto mt-5 grid max-w-md grid-cols-1 gap-2">
+            {[
+              ["cash_small", t("era.cashSmall")],
+              ["cash_large", t("era.cashLarge")],
+              ["sentiment", t("era.sentiment")],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => applyEraBonus(key)}
+                className="btn btn-ghost"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <button onClick={closeEraTransition} className="btn btn-primary mt-6 px-5">
             {t("story.close")}
           </button>
