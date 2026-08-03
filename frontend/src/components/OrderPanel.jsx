@@ -1,6 +1,14 @@
-import { useMemo, useState } from "react";
-import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Clock,
+  ListOrdered,
+  X,
+  Zap,
+} from "lucide-react";
 
+import { api } from "../api/client.js";
 import { useApp } from "../store/AppContext.jsx";
 import { money } from "../utils/format.js";
 
@@ -11,6 +19,21 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
   const { portfolio, executeTrade, busy, t } = useApp();
   const [action, setAction] = useState(defaultAction);
   const [shares, setShares] = useState("");
+  const [mode, setMode] = useState("market");
+  const [limitPrice, setLimitPrice] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [notice, setNotice] = useState("");
+
+  const refreshOrders = () => {
+    api
+      .getOrders()
+      .then((data) => setOrders(data.orders || []))
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    refreshOrders();
+  }, [stock?.ticker]);
 
   const holding = portfolio?.holdings?.find((item) => item.ticker === stock?.ticker);
   const price = stock?.price || 0;
@@ -26,15 +49,22 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
   const maxShares = action === "buy" ? maxBuy : maxSell;
   const blocked = action === "buy" ? stock?.limit_up : stock?.limit_down;
   const tPlusOne = action === "sell" && (holding?.locked_shares || 0) > 0;
+  const limitValid =
+    mode === "limit" &&
+    Number.parseFloat(limitPrice) > 0 &&
+    shareCount > 0 &&
+    shareCount * Number.parseFloat(limitPrice) >= 10;
 
   const canSubmit = useMemo(
     () =>
-      shareCount > 0 &&
-      gross >= 10 &&
-      !blocked &&
-      !tPlusOne &&
-      (action === "buy" ? gross + fee <= cash + 1e-6 : shareCount <= maxSell - (holding?.locked_shares || 0) + 1e-6),
-    [shareCount, gross, fee, cash, action, maxSell, blocked, tPlusOne, holding]
+      mode === "limit"
+        ? limitValid
+        : shareCount > 0 &&
+          gross >= 10 &&
+          !blocked &&
+          !tPlusOne &&
+          (action === "buy" ? gross + fee <= cash + 1e-6 : shareCount <= maxSell - (holding?.locked_shares || 0) + 1e-6),
+    [shareCount, gross, fee, cash, action, maxSell, blocked, tPlusOne, holding, mode, limitValid]
   );
 
   const setQuick = (fraction) => {
@@ -44,11 +74,38 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
 
   const submit = () => {
     if (!canSubmit) return;
+    setNotice("");
+    if (mode === "limit") {
+      api
+        .createOrder(
+          stock.ticker,
+          action === "buy" ? "buy_limit" : "sell_limit",
+          Number.parseFloat(limitPrice),
+          shareCount
+        )
+        .then(() => {
+          setNotice(t("order.limitPlaced"));
+          setShares("");
+          setLimitPrice("");
+          refreshOrders();
+        })
+        .catch((error) => setNotice(error.message));
+      return;
+    }
     executeTrade(action, stock.ticker, shareCount, stock.name);
     setShares("");
   };
 
+  const cancelOrder = (orderId) => {
+    api
+      .cancelOrder(orderId)
+      .then(refreshOrders)
+      .catch(() => {});
+  };
+
   if (!stock) return null;
+
+  const stockOrders = orders.filter((order) => order.ticker === stock.ticker);
 
   return (
     <div className="panel">
@@ -59,7 +116,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
       <div className="grid grid-cols-2 gap-1 border-b border-ink-600/70 p-2">
         <button
           onClick={() => setAction("buy")}
-          className={`flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-semibold transition-colors ${
+          className={`flex items-center justify-center gap-1.5 rounded-[3px] border px-3 py-2 text-sm font-semibold transition-colors ${
             action === "buy"
               ? "border-mint/50 bg-mint/15 text-mint"
               : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
@@ -70,7 +127,7 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         </button>
         <button
           onClick={() => setAction("sell")}
-          className={`flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-sm font-semibold transition-colors ${
+          className={`flex items-center justify-center gap-1.5 rounded-[3px] border px-3 py-2 text-sm font-semibold transition-colors ${
             action === "sell"
               ? "border-risk/50 bg-risk/15 text-risk"
               : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
@@ -78,6 +135,30 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         >
           <ArrowDownCircle size={16} />
           {t("order.sell")}
+        </button>
+      </div>
+      <div className="grid grid-cols-2 gap-1 border-b border-ink-600/70 p-2">
+        <button
+          onClick={() => setMode("market")}
+          className={`flex items-center justify-center gap-1.5 rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition-colors ${
+            mode === "market"
+              ? "border-brass/50 bg-brass/15 text-brass"
+              : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
+          }`}
+        >
+          <Zap size={13} />
+          {t("order.market")}
+        </button>
+        <button
+          onClick={() => setMode("limit")}
+          className={`flex items-center justify-center gap-1.5 rounded-[3px] border px-3 py-1.5 text-xs font-semibold transition-colors ${
+            mode === "limit"
+              ? "border-brass/50 bg-brass/15 text-brass"
+              : "border-ink-500/50 text-parch-500 hover:bg-ink-700/50"
+          }`}
+        >
+          <Clock size={13} />
+          {t("order.limit")}
         </button>
       </div>
       <div className="space-y-3 p-4">
@@ -113,6 +194,22 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
             </button>
           </div>
         </div>
+        {mode === "limit" ? (
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-parch-500">
+              {t("order.limitPrice")}
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={limitPrice}
+              onChange={(event) => setLimitPrice(event.target.value)}
+              placeholder="0.00"
+              className="input tabular"
+            />
+          </div>
+        ) : null}
         <dl className="space-y-1.5 text-xs">
           <div className="flex justify-between">
             <dt className="text-parch-600">{t("order.gross")}</dt>
@@ -140,12 +237,14 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
         {blocked ? (
           <p className="text-[11px] font-medium text-risk">
             {action === "buy" ? t("market.limitUp") : t("market.limitDown")}
-            ：{t(action === "buy" ? "order.noSellers" : "order.noBuyers")}
+            {" · "}
+            {t(action === "buy" ? "order.noSellers" : "order.noBuyers")}
           </p>
         ) : null}
         {tPlusOne ? (
           <p className="text-[11px] font-medium text-gold">{t("order.tPlusOne")}</p>
         ) : null}
+        {notice ? <p className="text-[11px] font-medium text-brass">{notice}</p> : null}
         <button
           onClick={submit}
           disabled={!canSubmit || busy}
@@ -160,6 +259,39 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
             : t("order.maxBuy", { shares: maxBuy.toFixed(2) })}
         </p>
       </div>
+      {stockOrders.length > 0 ? (
+        <div className="border-t border-ink-600/70">
+          <div className="flex items-center gap-2 px-4 py-2.5">
+            <ListOrdered size={13} className="text-brass" />
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-parch-600">
+              {t("order.openOrders")}
+            </p>
+          </div>
+          <ul className="divide-y divide-ink-600/50">
+            {stockOrders.map((order) => (
+              <li key={order.id} className="flex items-center gap-2 px-4 py-2 text-xs">
+                <span className="rounded-[3px] border border-brass/40 bg-brass/10 px-1.5 py-0.5 text-[10px] font-semibold text-brass">
+                  {t(`order.kind.${order.kind}`)}
+                </span>
+                <span className="tabular text-parch-300">{money(order.price)}</span>
+                <span className="tabular text-parch-500">{order.shares.toFixed(4)}</span>
+                <span className="ml-auto text-[10px] uppercase tracking-wide text-parch-600">
+                  {order.status}
+                </span>
+                {order.status === "open" ? (
+                  <button
+                    onClick={() => cancelOrder(order.id)}
+                    className="rounded p-1 text-parch-600 transition-colors hover:bg-ink-700 hover:text-risk"
+                    aria-label={t("order.cancel")}
+                  >
+                    <X size={12} />
+                  </button>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

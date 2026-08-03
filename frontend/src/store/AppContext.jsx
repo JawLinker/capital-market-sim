@@ -11,6 +11,7 @@ import {
 import { api } from "../api/client.js";
 import { setApiLanguage } from "../api/client.js";
 import { translations } from "../i18n/translations.js";
+import { sounds } from "../utils/sound.js";
 
 const AppContext = createContext(null);
 
@@ -66,6 +67,9 @@ export function AppProvider({ children }) {
   const [chronicleOpen, setChronicleOpen] = useState(false);
   const [eraTransition, setEraTransition] = useState(null);
   const [blackSwan, setBlackSwan] = useState(null);
+  const [muted, setMutedState] = useState(
+    () => localStorage.getItem("cms-muted") === "1"
+  );
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
@@ -167,6 +171,7 @@ export function AppProvider({ children }) {
         titles[item.code] = item.title;
       });
       const labels = unlocked.map((code) => titles[code] || code);
+      sounds.achievement();
       addToast(
         "achievement",
         t("toast.achievementTitle", { codes: labels.join(", ") }),
@@ -232,6 +237,13 @@ export function AppProvider({ children }) {
   const closeChronicle = useCallback(() => setChronicleOpen(false), []);
   const closeEraTransition = useCallback(() => setEraTransition(null), []);
   const closeBlackSwan = useCallback(() => setBlackSwan(null), []);
+  const toggleMute = useCallback(() => {
+    setMutedState((current) => {
+      const next = !current;
+      localStorage.setItem("cms-muted", next ? "1" : "0");
+      return next;
+    });
+  }, []);
 
   const login = useCallback(
     async (username, password) => {
@@ -311,7 +323,24 @@ export function AppProvider({ children }) {
       const result = await api.advanceDay(count);
       if (result.black_swan) {
         setBlackSwan(result.black_swan);
+        sounds.blackSwan();
       }
+      (result.duel_results || []).forEach((duel) => {
+        if (duel.result === "won") {
+          addToast(
+            "success",
+            t("duel.won"),
+            `${duel.rival} · +${duel.payout.toLocaleString()}`
+          );
+          sounds.duelWin();
+        } else if (duel.result === "lost") {
+          addToast("error", t("duel.lost"), duel.rival);
+          sounds.duelLose();
+        } else {
+          addToast("achievement", t("duel.tied"), duel.rival);
+        }
+      });
+      sounds.advance();
       addToast("success", t("toast.advanced", { days: result.days_advanced }));
       announceUnlocks(result.unlocked_achievements);
       await Promise.all([refreshAll(), loadMarket()]);
@@ -336,6 +365,8 @@ export function AppProvider({ children }) {
       try {
         const result = await api.trade(action, ticker, shares);
         const verb = t(action === "buy" ? "toast.bought" : "toast.sold");
+        if (action === "buy") sounds.buy();
+        else sounds.sell();
         addToast(
           "success",
           verb
@@ -425,6 +456,8 @@ export function AppProvider({ children }) {
       closeEraTransition,
       blackSwan,
       closeBlackSwan,
+      muted,
+      toggleMute,
       openStory,
       nextStory,
       closeStory,
@@ -470,6 +503,8 @@ export function AppProvider({ children }) {
       closeEraTransition,
       blackSwan,
       closeBlackSwan,
+      muted,
+      toggleMute,
       openStory,
       nextStory,
       closeStory,

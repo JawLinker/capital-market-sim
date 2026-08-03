@@ -213,10 +213,16 @@ def catalog(db: Session, player: models.Player, lang: str = "en") -> dict:
         milestone["progress"] = max(0.0, min(1.0, progress))
         milestone["reached"] = value >= milestone["threshold"]
 
+    streak = (
+        db.query(models.RankStreak)
+        .filter(models.RankStreak.player_id == player.id)
+        .first()
+    )
     return {
         "achievements": items,
         "milestones": milestones,
         "portfolio_value": round(value, 2),
         "unlocked_count": sum(1 for item in items if item["unlocked"]),
         "total_count": len(items),
+        "best_streak": streak.best_streak if streak else 0,
     }

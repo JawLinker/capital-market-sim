@@ -177,17 +177,25 @@ def seed_database(db: Session) -> bool:
             )
     db.add_all(rows)
 
-    player = models.Player(
-        name="Host",
-        username="host",
-        password_hash=hash_password(os.environ.get("CMS_HOST_PASSWORD", "123456")),
-        api_key=generate_api_key(),
-        is_host=1,
-        starting_cash=STARTING_CASH,
-        cash=STARTING_CASH,
+    existing_host = (
+        db.query(models.Player).filter(models.Player.is_host == 1).first()
     )
-    db.add(player)
-    db.flush()
+    if existing_host is not None:
+        existing_host.starting_cash = STARTING_CASH
+        existing_host.cash = STARTING_CASH
+        player = existing_host
+    else:
+        player = models.Player(
+            name="Host",
+            username="host",
+            password_hash=hash_password(os.environ.get("CMS_HOST_PASSWORD", "123456")),
+            api_key=generate_api_key(),
+            is_host=1,
+            starting_cash=STARTING_CASH,
+            cash=STARTING_CASH,
+        )
+        db.add(player)
+        db.flush()
 
     state = models.GameState(
         id=1,
@@ -221,7 +229,13 @@ def seed_database(db: Session) -> bool:
         )
     )
 
+    existing_achievement_codes = {
+        code
+        for (code,) in db.query(models.Achievement.code).all()
+    }
     for code, title, description, category in ACHIEVEMENTS:
+        if code in existing_achievement_codes:
+            continue
         db.add(
             models.Achievement(
                 code=code,

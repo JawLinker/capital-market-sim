@@ -68,6 +68,21 @@ export const api = {
   getCommission: () => request("/api/quests/commission"),
   getStorylines: () => request("/api/storylines"),
   getReplay: () => request("/api/replay"),
+  getBots: () => request("/api/bots"),
+  createOrder: (ticker, kind, price, shares) =>
+    request("/api/orders", {
+      method: "POST",
+      body: JSON.stringify({ ticker, kind, price, shares }),
+    }),
+  getOrders: () => request("/api/orders"),
+  cancelOrder: (orderId) =>
+    request(`/api/orders/${orderId}/cancel`, { method: "POST" }),
+  createDuel: (rivalId, stake, days) =>
+    request("/api/duels", {
+      method: "POST",
+      body: JSON.stringify({ rival_id: rivalId, stake, days }),
+    }),
+  getDuels: () => request("/api/duels"),
   getPortfolio: () => request("/api/portfolio"),
   getAdvisorReport: () => request("/api/advisor/portfolio"),
   advisorChat: (message) =>

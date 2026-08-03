@@ -12,10 +12,13 @@ os.environ["MARKET_DB_URL"] = f"sqlite:///{tmp_db}"
 from fastapi.testclient import TestClient  # noqa: E402
 
 from app.main import app  # noqa: E402
+from app.database import engine  # noqa: E402
 
 
 @pytest.fixture()
 def client():
+    engine.dispose()
+    if tmp_db.exists():
+        tmp_db.unlink()
     with TestClient(app) as test_client:
-        test_client.post("/api/game/reset")
         yield test_client

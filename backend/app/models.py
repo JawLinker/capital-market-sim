@@ -103,6 +103,36 @@ class RankStreak(Base):
     last_day = Column(Integer, nullable=False, default=-1)
 
 
+class PendingOrder(Base):
+    __tablename__ = "pending_orders"
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False, index=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False, index=True)
+    kind = Column(String(20), nullable=False)
+    price = Column(Float, nullable=False)
+    shares = Column(Float, nullable=False)
+    created_day = Column(Integer, nullable=False)
+    status = Column(String(12), nullable=False, default="open")
+    filled_day = Column(Integer, nullable=True)
+
+
+class Duel(Base):
+    __tablename__ = "duels"
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False, index=True)
+    rival_id = Column(Integer, ForeignKey("rivals.id"), nullable=False, index=True)
+    stake = Column(Float, nullable=False)
+    start_day = Column(Integer, nullable=False)
+    end_day = Column(Integer, nullable=False)
+    status = Column(String(12), nullable=False, default="open")
+    player_return = Column(Float, nullable=True)
+    rival_return = Column(Float, nullable=True)
+    settled_day = Column(Integer, nullable=True)
+    created_at = Column(String(32), default=utc_now)
+
+
 class Holding(Base):
     __tablename__ = "holdings"
     __table_args__ = (UniqueConstraint("player_id", "stock_id", name="uq_holding"),)

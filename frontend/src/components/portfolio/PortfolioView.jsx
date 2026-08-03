@@ -1,5 +1,16 @@
-import { ArrowDownCircle, ArrowUpCircle, Banknote, Briefcase, PieChart, ScrollText } from "lucide-react";
+import { useState } from "react";
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Banknote,
+  Briefcase,
+  PieChart,
+  ScrollText,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
 
+import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
 import { industryColor, money, percent, toneClass } from "../../utils/format.js";
 import LineChart from "../charts/LineChart.jsx";
@@ -16,6 +27,7 @@ function lessonFor(trade, t) {
 
 export default function PortfolioView() {
   const { portfolio, selectTicker, t } = useApp();
+  const [guardNotice, setGuardNotice] = useState("");
   const summary = portfolio?.summary;
   const holdings = portfolio?.holdings || [];
   const allocation = portfolio?.allocation?.breakdown || [];
@@ -27,6 +39,19 @@ export default function PortfolioView() {
     })) || [];
   const journalEntries = [...transactions].reverse();
   const unrealizedTotal = holdings.reduce((sum, item) => sum + item.unrealized_pnl, 0);
+
+  const placeGuard = (kind, holding) => {
+    const multiplier = kind === "stop_loss" ? 0.95 : 1.1;
+    api
+      .createOrder(
+        holding.ticker,
+        kind,
+        Math.round(holding.price * multiplier * 100) / 100,
+        holding.shares
+      )
+      .then(() => setGuardNotice(t("portfolio.guardPlaced")))
+      .catch((error) => setGuardNotice(error.message));
+  };
 
   return (
     <div className="space-y-4 p-4 lg:p-5">
@@ -103,6 +128,11 @@ export default function PortfolioView() {
 
       <section className="panel overflow-hidden">
         <SectionTitle title={t("portfolio.holdingsTitle")} detail={t("portfolio.holdingsDetail")} />
+        {guardNotice ? (
+          <p className="border-b border-ink-600/60 bg-brass/10 px-4 py-2 text-xs text-brass">
+            {guardNotice}
+          </p>
+        ) : null}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] border-collapse">
             <thead>
@@ -142,6 +172,22 @@ export default function PortfolioView() {
                   <td className="td text-parch-300">{holding.weight.toFixed(1)}%</td>
                   <td className="td">
                     <div className="flex gap-1" onClick={(event) => event.stopPropagation()}>
+                      <button
+                        onClick={() => placeGuard("stop_loss", holding)}
+                        className="btn btn-ghost px-2 py-1 text-xs"
+                        title={t("portfolio.stopLoss")}
+                      >
+                        <ShieldAlert size={12} />
+                        {t("portfolio.stopLossShort")}
+                      </button>
+                      <button
+                        onClick={() => placeGuard("take_profit", holding)}
+                        className="btn btn-ghost px-2 py-1 text-xs"
+                        title={t("portfolio.takeProfit")}
+                      >
+                        <ShieldCheck size={12} />
+                        {t("portfolio.takeProfitShort")}
+                      </button>
                       <button
                         onClick={() => selectTicker(holding.ticker)}
                         className="btn btn-ghost px-2 py-1 text-xs"

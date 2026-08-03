@@ -14,6 +14,8 @@ import {
   RotateCcw,
   Sparkles,
   Trophy,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -92,6 +94,8 @@ function TopBar() {
     logout,
     openStory,
     chronicle,
+    muted,
+    toggleMute,
   } = useApp();
   const [fastDays, setFastDays] = useState(30);
   const market = gameState?.market;
@@ -196,6 +200,13 @@ function TopBar() {
         >
           <Globe size={16} />
           <span className="hidden sm:inline">{lang === "en" ? "中文" : "EN"}</span>
+        </button>
+        <button
+          onClick={toggleMute}
+          className="btn btn-ghost px-2.5"
+          title={muted ? t("topbar.soundOff") : t("topbar.soundOn")}
+        >
+          {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
         </button>
         {authPlayer ? (
           <div className="hidden items-center gap-2 rounded-[3px] border border-ink-600/70 bg-ink-800/70 px-2.5 py-1.5 sm:flex">

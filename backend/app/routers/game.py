@@ -13,6 +13,8 @@ from ..services.gamification import check_all
 from ..services.market_engine import advance_day
 from ..i18n import get_lang
 from ..services.blackswan import localize_black_swan, pick_black_swan
+from ..services.duels import settle_duels
+from ..services.pending_orders import execute_pending_orders
 
 router = APIRouter(prefix="/api", tags=["game"])
 
@@ -92,6 +94,8 @@ def post_advance(
     result = None
     for _ in range(days):
         result = advance_day(db)
+    execute_pending_orders(db)
+    duel_results = settle_duels(db)
     black_swan = None
     if days == 1 and random.random() < 0.03:
         state = db.query(models.GameState).first()
@@ -121,6 +125,7 @@ def post_advance(
         "unlocked_achievements": unlocked,
         "portfolio": summary,
         "black_swan": black_swan,
+        "duel_results": duel_results,
     }
 
 
@@ -134,27 +139,63 @@ def post_reset(request: Request, db: Session = Depends(get_db)):
             else "Only the host can reset the game"
         )
         raise HTTPException(status_code=403, detail=detail)
+    guest_ids = [
+        row.id
+        for row in db.query(models.Player)
+        .filter(models.Player.is_host != 1)
+        .all()
+    ]
+    if guest_ids:
+        for table in (
+            models.UnlockedAchievement,
+            models.PortfolioHistory,
+            models.Transaction,
+            models.Holding,
+            models.RankStreak,
+            models.StorylineProgress,
+            models.PendingOrder,
+            models.Duel,
+        ):
+            db.query(table).filter(table.player_id.in_(guest_ids)).delete(
+                synchronize_session=False
+            )
+        db.query(models.Player).filter(models.Player.is_host != 1).delete(
+            synchronize_session=False
+        )
     for table in (
-        models.UnlockedAchievement,
         models.PortfolioHistory,
         models.Transaction,
         models.Holding,
+        models.PendingOrder,
+        models.Duel,
+    ):
+        db.query(table).filter(table.player_id == player.id).delete(
+            synchronize_session=False
+        )
+    for table in (
         models.NewsEvent,
         models.PriceHistory,
         models.BotTrade,
         models.BotHistory,
         models.BotHolding,
-        models.StorylineProgress,
-        models.RankStreak,
         models.Rival,
-        models.Achievement,
-        models.Player,
         models.Stock,
         models.GameState,
     ):
-        db.query(table).delete()
+        db.query(table).delete(synchronize_session=False)
     db.commit()
     from ..seed import seed_database
 
     seed_database(db)
+    host = db.query(models.Player).filter(models.Player.is_host == 1).first()
+    if host is not None:
+        streak = (
+            db.query(models.RankStreak)
+            .filter(models.RankStreak.player_id == host.id)
+            .first()
+        )
+        if streak is not None:
+            streak.current_streak = 0
+            streak.last_day = -1
+            db.commit()
     return {"status": "reset", "day": 0}

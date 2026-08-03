@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 import {
   CalendarDays,
   CheckCircle2,
+  Dices,
   Lock,
   MessagesSquare,
+  Scale,
   Target,
   Trophy,
 } from "lucide-react";
 
 import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
+import { money } from "../../utils/format.js";
 import Avatar from "../Avatar.jsx";
 import { ArchiveCard, MuseumHeader } from "../museum.jsx";
 import { Badge } from "../ui.jsx";
@@ -56,6 +59,12 @@ export default function QuestBookView() {
   const [daily, setDaily] = useState(null);
   const [commission, setCommission] = useState(null);
   const [storylines, setStorylines] = useState([]);
+  const [rivals, setRivals] = useState([]);
+  const [duels, setDuels] = useState([]);
+  const [rivalId, setRivalId] = useState("");
+  const [stake, setStake] = useState("100");
+  const [days, setDays] = useState(10);
+  const [duelNotice, setDuelNotice] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -63,15 +72,32 @@ export default function QuestBookView() {
       api.getDailyQuest(),
       api.getCommission(),
       api.getStorylines(),
+      api.getBots(),
+      api.getDuels(),
     ])
-      .then(([bookData, dailyData, commissionData, storylineData]) => {
+      .then(([bookData, dailyData, commissionData, storylineData, botData, duelData]) => {
         setBook(bookData || { arcs: [] });
         setDaily(dailyData);
         setCommission(commissionData);
         setStorylines(storylineData?.storylines || []);
+        setRivals(botData?.bots || []);
+        setDuels(duelData?.duels || []);
+        if (botData?.bots?.length) setRivalId(String(botData.bots[0].id));
       })
       .catch(() => {});
   }, []);
+
+  const placeDuel = () => {
+    setDuelNotice("");
+    api
+      .createDuel(Number(rivalId), Number.parseFloat(stake), days)
+      .then(() => {
+        setDuelNotice(t("duel.placed"));
+        return api.getDuels();
+      })
+      .then((data) => setDuels(data.duels || []))
+      .catch((error) => setDuelNotice(error.message));
+  };
 
   const activeArc =
     book.arcs.find((arc) => arc.key === chronicle?.arc_key) ||
@@ -269,6 +295,100 @@ export default function QuestBookView() {
               </article>
             );
           })}
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-center gap-2">
+          <Dices size={16} className="text-brass" />
+          <h2 className="font-display text-lg font-bold text-parch-100">{t("duel.title")}</h2>
+          <p className="text-xs text-parch-500">{t("duel.detail")}</p>
+        </div>
+        <div className="panel p-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+            <select
+              value={rivalId}
+              onChange={(event) => setRivalId(event.target.value)}
+              className="input"
+            >
+              {rivals.map((rival) => (
+                <option key={rival.id} value={rival.id}>
+                  {rival.name} ({rival.return_pct}%)
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min="1"
+              value={stake}
+              onChange={(event) => setStake(event.target.value)}
+              className="input tabular"
+              aria-label={t("duel.stake")}
+            />
+            <select
+              value={days}
+              onChange={(event) => setDays(Number(event.target.value))}
+              className="input"
+              aria-label={t("duel.days")}
+            >
+              {[5, 10, 20, 30].map((option) => (
+                <option key={option} value={option}>
+                  {option} {t("duel.daysUnit")}
+                </option>
+              ))}
+            </select>
+            <button onClick={placeDuel} className="btn btn-primary">
+              <Scale size={15} />
+              {t("duel.place")}
+            </button>
+          </div>
+          {duelNotice ? (
+            <p className="mt-3 text-xs text-brass">{duelNotice}</p>
+          ) : null}
+          {duels.length > 0 ? (
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[560px] border-collapse">
+                <thead>
+                  <tr>
+                    <th className="th">{t("duel.rival")}</th>
+                    <th className="th">{t("duel.stake")}</th>
+                    <th className="th">{t("duel.period")}</th>
+                    <th className="th">{t("duel.status")}</th>
+                    <th className="th">{t("duel.returns")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {duels.map((duel) => (
+                    <tr key={duel.id} className="hover:bg-ink-700/40">
+                      <td className="td font-semibold text-parch-100">{duel.rival}</td>
+                      <td className="td">{money(duel.stake)}</td>
+                      <td className="td text-parch-500">
+                        {duel.start_day} - {duel.end_day}
+                      </td>
+                      <td className="td">
+                        <span
+                          className={`rounded-[3px] border px-1.5 py-0.5 text-[10px] font-bold ${
+                            duel.status === "won"
+                              ? "border-mint/40 bg-mint/10 text-mint"
+                              : duel.status === "lost"
+                                ? "border-risk/40 bg-risk/10 text-risk"
+                                : "border-brass/40 bg-brass/10 text-brass"
+                          }`}
+                        >
+                          {t(`duel.${duel.status}`)}
+                        </span>
+                      </td>
+                      <td className="td text-parch-500">
+                        {duel.player_return != null
+                          ? `${duel.player_return}% vs ${duel.rival_return}%`
+                          : "…"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
         </div>
       </section>
 

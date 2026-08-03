@@ -161,6 +161,9 @@ export default function AchievementsView() {
                   wins: leaderboard?.wins,
                 })}
               </Badge>
+              <Badge className="border-gold/40 bg-gold/10 text-gold">
+                {t("achievements.bestStreak", { days: achievements?.best_streak || 0 })}
+              </Badge>
             </div>
           }
         />
