@@ -71,11 +71,11 @@ def get_leaderboard(request: Request, db: Session = Depends(get_db)):
     for index, entry in enumerate(entries, start=1):
         entry["rank"] = index
         if entry.get("is_current"):
-            if index <= 3:
+            if index == 1:
                 entry["medal"] = "gold"
-            elif index <= 10:
+            elif index == 2:
                 entry["medal"] = "silver"
-            elif index <= 20:
+            elif index == 3:
                 entry["medal"] = "bronze"
             else:
                 entry["medal"] = None
