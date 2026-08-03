@@ -65,10 +65,11 @@ ARCS = [
                 "prose_zh": "锂电与光伏成为市场主线，卖方报告一页难求，散户开始背产业链名词。",
                 "prose_en": "Batteries and solar become the market's main line; sell-side reports are scarce and retail investors start memorizing supply-chain terms.",
                 "objective": {
-                    "type": "tech_exposure",
+                    "type": "sector_exposure",
+                    "industry": "energy",
                     "target": 25,
-                    "label_zh": "科技板块仓位达到 25%",
-                    "label_en": "Hold 25% of your portfolio in tech",
+                    "label_zh": "能源板块仓位达到 25%",
+                    "label_en": "Hold 25% of your portfolio in energy",
                 },
             },
             {
@@ -132,10 +133,11 @@ ARCS = [
                 "prose_zh": "有人说这是最后一跌，有人说还要等一年。历史还没写，但筹码已经开始换手。",
                 "prose_en": "Some call it the last drop, others say to wait another year. History has not been written, but chips are already changing hands.",
                 "objective": {
-                    "type": "cash_ratio",
-                    "target": 25,
-                    "label_zh": "现金占组合比例达到 25%",
-                    "label_en": "Keep 25% of your portfolio in cash",
+                    "type": "sector_exposure",
+                    "industry": "finance",
+                    "target": 15,
+                    "label_zh": "金融板块仓位达到 15%",
+                    "label_en": "Hold 15% of your portfolio in finance",
                 },
             },
         ],
@@ -157,10 +159,10 @@ ARCS = [
                 "prose_zh": "指数平淡，资金只在两头抱团：高股息与新技术，中间地带无人问津。",
                 "prose_en": "The index is flat while money clusters at both ends of the barbell: high dividends and new tech, with nothing in between.",
                 "objective": {
-                    "type": "tech_exposure",
-                    "target": 20,
-                    "label_zh": "科技板块仓位达到 20%",
-                    "label_en": "Hold 20% of your portfolio in tech",
+                    "type": "diversified",
+                    "target": 3,
+                    "label_zh": "持仓覆盖 3 个行业",
+                    "label_en": "Hold positions in three industries",
                 },
             },
             {
@@ -224,10 +226,10 @@ ARCS = [
                 "prose_zh": "市场开始认真讨论生肖、星座和 K 线形状，连分析师都分不清谁在开玩笑。",
                 "prose_en": "The market seriously debates zodiac signs, star signs, and candlestick shapes, until even analysts can't tell who is joking.",
                 "objective": {
-                    "type": "tech_return",
-                    "target": 5000,
-                    "label_zh": "科技持仓浮盈与已实现收益合计达到 5,000",
-                    "label_en": "Earn 5,000 combined realized and unrealized profit in tech",
+                    "type": "daily_gain",
+                    "target": 2,
+                    "label_zh": "单日组合收益达到 2%",
+                    "label_en": "Gain 2% of portfolio value in a single day",
                 },
             },
             {
@@ -263,10 +265,11 @@ ARCS = [
                 "prose_zh": "指数缓慢爬坡，老股民说这是修复，新股民说这是牛市，两边都觉得自己赢了。",
                 "prose_en": "The index climbs slowly; veterans call it repair, newcomers call it a bull, and both sides think they won.",
                 "objective": {
-                    "type": "tech_exposure",
+                    "type": "sector_exposure",
+                    "industry": "healthcare",
                     "target": 20,
-                    "label_zh": "科技板块仓位达到 20%",
-                    "label_en": "Hold 20% of your portfolio in tech",
+                    "label_zh": "医疗板块仓位达到 20%",
+                    "label_en": "Hold 20% of your portfolio in healthcare",
                 },
             },
             {
@@ -422,6 +425,58 @@ def evaluate_objective(db: Session, player: models.Player, objective: dict, lang
     elif kind == "total_return":
         total = _player_value(db, player)
         current = (total / player.starting_cash - 1.0) * 100 if player.starting_cash else 0.0
+    elif kind == "sector_exposure":
+        industry = objective.get("industry")
+        total = _player_value(db, player)
+        sector = 0.0
+        for holding, stock in _sector_holdings(db, player, industry):
+            sector += holding.shares * stock.price
+        current = (sector / total * 100) if total > 0 else 0.0
+    elif kind == "sector_return":
+        industry = objective.get("industry")
+        realized = (
+            db.query(models.Transaction)
+            .join(models.Stock, models.Transaction.stock_id == models.Stock.id)
+            .filter(
+                models.Transaction.player_id == player.id,
+                models.Stock.industry == industry,
+            )
+            .with_entities(models.Transaction.realized_pnl)
+            .all()
+        )
+        current = sum(row[0] for row in realized if row[0])
+        for holding, stock in _sector_holdings(db, player, industry):
+            current += (stock.price - holding.avg_cost) * holding.shares
+    elif kind == "trade_count":
+        current = float(
+            db.query(models.Transaction)
+            .filter(models.Transaction.player_id == player.id)
+            .count()
+        )
+    elif kind == "hold_count":
+        current = float(
+            db.query(models.Holding)
+            .filter(models.Holding.player_id == player.id)
+            .count()
+        )
+    elif kind == "diversified":
+        industries = {
+            db.get(models.Stock, holding.stock_id).industry
+            for holding in db.query(models.Holding)
+            .filter(models.Holding.player_id == player.id)
+            .all()
+        }
+        current = float(len(industries))
+    elif kind == "daily_gain":
+        rows = (
+            db.query(models.PortfolioHistory)
+            .filter(models.PortfolioHistory.player_id == player.id)
+            .order_by(models.PortfolioHistory.day.desc())
+            .limit(2)
+            .all()
+        )
+        if len(rows) >= 2 and rows[1].value:
+            current = (rows[0].value / rows[1].value - 1.0) * 100
 
     return {
         "label": objective.get("label_zh") if zh else objective.get("label_en"),
@@ -585,3 +640,14 @@ def _player_title(arc: dict, date: str, zh: bool) -> dict:
         "code": title_code,
         "label": last_reward[0] if zh else last_reward[1],
     }
+
+
+def _sector_holdings(db: Session, player: models.Player, industry: str | None):
+    query = (
+        db.query(models.Holding, models.Stock)
+        .join(models.Stock, models.Holding.stock_id == models.Stock.id)
+        .filter(models.Holding.player_id == player.id)
+    )
+    if industry:
+        query = query.filter(models.Stock.industry == industry)
+    return query.all()

@@ -22,3 +22,48 @@ def test_quests_localization(client):
     en = client.get("/api/quests/daily", headers={"accept-language": "en"}).json()
     zh = client.get("/api/quests/daily", headers={"accept-language": "zh"}).json()
     assert en["title"] != zh["title"]
+
+
+def test_quest_objectives_are_diverse(client):
+    from app.services.chronicle import ARCS
+    from app.services.quests import DAILY_POOL
+    from app.services.storylines import STORYLINES
+
+    types = []
+    for arc in ARCS:
+        types += [beat["objective"]["type"] for beat in arc["beats"]]
+    types += [task["type"] for task in DAILY_POOL]
+    types += [
+        chapter["objective"]["type"]
+        for storyline in STORYLINES
+        for chapter in storyline["chapters"]
+    ]
+    assert len(set(types)) >= 8
+    tech = sum(
+        1
+        for kind in types
+        if kind in {"tech_exposure", "tech_return", "tech_holdings"}
+    )
+    assert tech / len(types) < 0.4
+
+
+def test_new_objective_types_evaluate(client):
+    from app import models
+    from app.database import SessionLocal
+    from app.services.chronicle import evaluate_objective
+
+    db = SessionLocal()
+    player = db.query(models.Player).first()
+    objectives = [
+        {"type": "sector_exposure", "industry": "energy", "target": 10, "label_zh": "x", "label_en": "x"},
+        {"type": "sector_return", "industry": "energy", "target": 100, "label_zh": "x", "label_en": "x"},
+        {"type": "trade_count", "target": 1, "label_zh": "x", "label_en": "x"},
+        {"type": "hold_count", "target": 1, "label_zh": "x", "label_en": "x"},
+        {"type": "diversified", "target": 1, "label_zh": "x", "label_en": "x"},
+        {"type": "daily_gain", "target": 1, "label_zh": "x", "label_en": "x"},
+    ]
+    for objective in objectives:
+        result = evaluate_objective(db, player, objective, "en")
+        assert "current" in result
+        assert "met" in result
+    db.close()
