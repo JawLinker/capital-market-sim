@@ -316,7 +316,11 @@ export function AppProvider({ children }) {
       announceUnlocks(result.unlocked_achievements);
       await Promise.all([refreshAll(), loadMarket()]);
       const todayStory = await loadStory(false);
-      if (todayStory && result.days_advanced === 1) {
+      if (
+        todayStory &&
+        result.days_advanced === 1 &&
+        result.result?.day % 5 === 1
+      ) {
         setStoryOpen(true);
       }
     } catch (error) {
