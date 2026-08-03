@@ -16,12 +16,13 @@ const FEE_RATE = 0.0015;
 const MIN_FEE = 1;
 
 export default function OrderPanel({ stock, defaultAction = "buy" }) {
-  const { portfolio, executeTrade, busy, t } = useApp();
+  const { portfolio, executeTrade, busy, t, autoPlay, dayMinutes, countdown } = useApp();
   const [action, setAction] = useState(defaultAction);
   const [shares, setShares] = useState("");
   const [mode, setMode] = useState("market");
   const [channel, setChannel] = useState("exchange");
   const [leverage, setLeverage] = useState(1);
+  const [intradayPrice, setIntradayPrice] = useState(null);
   const [limitPrice, setLimitPrice] = useState("");
   const [orders, setOrders] = useState([]);
   const [notice, setNotice] = useState("");
@@ -36,6 +37,21 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
   useEffect(() => {
     refreshOrders();
   }, [stock?.ticker]);
+
+  useEffect(() => {
+    if (!autoPlay || !stock?.ticker) return undefined;
+    const refresh = () => {
+      const windowSeconds = dayMinutes * 60;
+      const elapsed = Math.max(0, windowSeconds - countdown);
+      api
+        .getIntraday(stock.ticker, elapsed, windowSeconds)
+        .then((data) => setIntradayPrice(data.price))
+        .catch(() => {});
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 1000);
+    return () => window.clearInterval(timer);
+  }, [autoPlay, stock?.ticker, dayMinutes, countdown]);
 
   const holding = portfolio?.holdings?.find((item) => item.ticker === stock?.ticker);
   const price = stock?.price || 0;
@@ -100,7 +116,8 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
       shareCount,
       stock.name,
       channel === "dark",
-      leverage
+      leverage,
+      channel === "dark" ? null : intradayPrice
     );
     setShares("");
   };

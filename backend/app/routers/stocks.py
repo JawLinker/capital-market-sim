@@ -7,6 +7,7 @@ from ..database import get_db
 from ..i18n import company_name, get_lang
 from ..services.orderbook import is_limit_down, is_limit_up
 from ..services.replay import index_series
+from ..services.intraday import intraday_price
 
 router = APIRouter(prefix="/api", tags=["stocks"])
 
@@ -162,3 +163,29 @@ def get_history(
         for row in reversed(rows)
     ]
     return {"ticker": stock.ticker, "series": series}
+
+
+@router.get("/stocks/{ticker}/intraday")
+def get_intraday(
+    ticker: str,
+    elapsed: float = 0,
+    window: float = 120,
+    db: Session = Depends(get_db),
+):
+    stock = (
+        db.query(models.Stock)
+        .filter(models.Stock.ticker == ticker.upper())
+        .first()
+    )
+    if stock is None:
+        raise HTTPException(status_code=404, detail="Stock not found")
+    state = db.query(models.GameState).first()
+    price = intraday_price(stock, state.day if state else 0, elapsed, window)
+    return {
+        "ticker": stock.ticker,
+        "base": round(stock.price, 2),
+        "price": price,
+        "change_pct": round((price / stock.prev_close - 1.0) * 100, 2)
+        if stock.prev_close
+        else 0.0,
+    }

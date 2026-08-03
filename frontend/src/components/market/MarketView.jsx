@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Newspaper, Search } from "lucide-react";
 
+import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
 import {
   compactMoney,
@@ -34,6 +35,8 @@ export default function MarketView() {
     gameState,
     t,
     autoPlay,
+    dayMinutes,
+    countdown,
   } = useApp();
   const [search, setSearch] = useState("");
   const [intradayPrice, setIntradayPrice] = useState(0);
@@ -90,16 +93,18 @@ export default function MarketView() {
 
   useEffect(() => {
     if (!autoPlay) return undefined;
-    const timer = window.setInterval(() => {
-      setIntradayPrice((current) => {
-        const base = quote?.price || current;
-        const band = base * 0.02;
-        const next = current + (Math.random() - 0.5) * base * 0.004;
-        return Math.max(base - band, Math.min(base + band, next));
-      });
-    }, 1500);
+    const refresh = () => {
+      const windowSeconds = dayMinutes * 60;
+      const elapsed = Math.max(0, windowSeconds - countdown);
+      api
+        .getIntraday(quote?.ticker, elapsed, windowSeconds)
+        .then((data) => setIntradayPrice(data.price))
+        .catch(() => {});
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 1000);
     return () => window.clearInterval(timer);
-  }, [autoPlay, quote?.price]);
+  }, [autoPlay, quote?.ticker, dayMinutes, countdown]);
 
   return (
     <div className="grid h-full grid-cols-1 gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_400px] lg:p-5">

@@ -53,6 +53,10 @@ export const api = {
     return request(`/api/stocks${query ? `?${query}` : ""}`);
   },
   getStock: (ticker) => request(`/api/stocks/${encodeURIComponent(ticker)}`),
+  getIntraday: (ticker, elapsed = 0, window = 120) =>
+    request(
+      `/api/stocks/${encodeURIComponent(ticker)}/intraday?elapsed=${elapsed}&window=${window}`
+    ),
   getHistory: (ticker, limit = 252) =>
     request(`/api/stocks/${encodeURIComponent(ticker)}/history?limit=${limit}`),
   getIndexHistory: (limit = 510) => request(`/api/index/history?limit=${limit}`),
@@ -121,7 +125,7 @@ export const api = {
   getPlayerActivity: (limit = 30) => request(`/api/players/activity?limit=${limit}`),
   getBot: (id, limit = 120) => request(`/api/bots/${id}?limit=${limit}`),
   getTransactions: (limit = 100) => request(`/api/transactions?limit=${limit}`),
-  trade: (action, ticker, shares, darkPool = false, leverage = 1) =>
+  trade: (action, ticker, shares, darkPool = false, leverage = 1, intradayPrice = null) =>
     request("/api/trades", {
       method: "POST",
       body: JSON.stringify({
@@ -130,6 +134,7 @@ export const api = {
         shares,
         dark_pool: darkPool,
         leverage,
+        intraday_price: intradayPrice,
       }),
     }),
   advanceDay: (days = 1) =>

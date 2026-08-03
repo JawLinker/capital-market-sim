@@ -9,6 +9,7 @@ class TradeRequest(BaseModel):
     shares: float = Field(gt=0)
     dark_pool: bool = False
     leverage: float = Field(default=1.0, ge=1.0, le=2.0)
+    intraday_price: float | None = None
 
 
 class ChatRequest(BaseModel):

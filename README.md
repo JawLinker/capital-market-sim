@@ -66,6 +66,8 @@ Every price move is real history, replayed day by day.
   forced liquidation when the maintenance ratio drops below 130%
 - **Margin call grace**: falling below 130% starts a 3-day top-up window, and
   the portfolio page offers a one-click margin repayment to self-rescue
+- **Live intraday prices**: during auto play, prices tick in real time on the
+  server and market orders fill at the live price you see
 - **Newspaper earnings & policy wires**: giant-company earnings open as a
   Capital Daily front page, and policy/international shocks join the black swan
   pool from 2021 to 2026

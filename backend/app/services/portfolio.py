@@ -208,6 +208,7 @@ def execute_trade(
     shares: float,
     dark_pool: bool = False,
     leverage: float = 1.0,
+    intraday_price: float | None = None,
 ) -> dict:
     shares = round(shares, 4)
     state = db.query(models.GameState).first()
@@ -225,7 +226,16 @@ def execute_trade(
             raise ValueError(
                 "\u73b0\u91d1\u4e0d\u8db3\uff0c\u65e0\u6cd5\u5b8c\u6210\u8be5\u8ba2\u5355\uff08\u542b\u624b\u7eed\u8d39\uff09"
             )
-    if dark_pool:
+    if intraday_price is not None and intraday_price > 0:
+        band = (stock.limit_pct or 10.0) / 100.0
+        exec_price = round(
+            max(
+                stock.prev_close * (1 - band),
+                min(stock.prev_close * (1 + band), intraday_price),
+            ),
+            4,
+        )
+    elif dark_pool:
         mid = (stock.bid + stock.ask) / 2.0 if stock.bid and stock.ask else stock.price
         exec_price = round(mid, 4)
         pool_shares = int(stock.avg_volume * 0.02)
