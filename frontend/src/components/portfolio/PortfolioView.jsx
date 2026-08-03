@@ -1,14 +1,13 @@
-import { useState } from "react";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
   Banknote,
   Briefcase,
   PieChart,
-  ScrollText,
   ShieldAlert,
   ShieldCheck,
 } from "lucide-react";
+import { useState } from "react";
 
 import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
@@ -18,26 +17,17 @@ import DonutChart from "../charts/DonutChart.jsx";
 import { MuseumHeader } from "../museum.jsx";
 import { Badge, Change, EmptyState, SectionTitle, StatCard } from "../ui.jsx";
 
-function lessonFor(trade, t) {
-  if (trade.action === "buy") return t("journal.lessonBuy");
-  if (trade.realized_pnl > 0) return t("journal.lessonProfit");
-  if (trade.realized_pnl < 0) return t("journal.lessonLoss");
-  return t("journal.lessonFlat");
-}
-
 export default function PortfolioView() {
   const { portfolio, selectTicker, t } = useApp();
   const [guardNotice, setGuardNotice] = useState("");
   const summary = portfolio?.summary;
   const holdings = portfolio?.holdings || [];
   const allocation = portfolio?.allocation?.breakdown || [];
-  const transactions = portfolio?.transactions || [];
   const performanceSeries =
     portfolio?.performance?.series.map((point) => ({
       date: point.date,
       value: point.value,
     })) || [];
-  const journalEntries = [...transactions].reverse();
   const unrealizedTotal = holdings.reduce((sum, item) => sum + item.unrealized_pnl, 0);
 
   const placeGuard = (kind, holding) => {
@@ -56,9 +46,9 @@ export default function PortfolioView() {
   return (
     <div className="space-y-4 p-4 lg:p-5">
       <MuseumHeader
-        kicker={t("journal.kicker")}
-        title={t("journal.title")}
-        detail={t("journal.detail")}
+        kicker={t("portfolio.kicker")}
+        title={t("portfolio.pageTitle")}
+        detail={t("portfolio.pageDetail")}
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -208,60 +198,6 @@ export default function PortfolioView() {
             />
           ) : null}
         </div>
-      </section>
-
-      <section>
-        <div className="mb-3 flex items-center gap-2">
-          <ScrollText size={16} className="text-brass" />
-          <h2 className="font-display text-lg font-bold text-parch-100">{t("journal.entries")}</h2>
-        </div>
-        {journalEntries.length > 0 ? (
-          <div className="space-y-3">
-            {journalEntries.map((trade) => (
-              <article key={trade.id} className="paper-panel px-4 py-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      className={
-                        trade.action === "buy"
-                          ? "border-ink-900/30 bg-ink-900/10 text-ink-900"
-                          : "border-risk/40 bg-risk/10 text-risk"
-                      }
-                    >
-                      {t(trade.action === "buy" ? "order.buy" : "order.sell")}
-                    </Badge>
-                    <h3 className="font-display text-sm font-bold text-ink-950">
-                      {trade.name || trade.ticker}
-                    </h3>
-                  </div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-900/60">
-                    {t("journal.tradingDay", { day: trade.day })}
-                  </p>
-                </div>
-                <p className="mt-1.5 text-xs leading-5 text-ink-900/75">
-                  {trade.shares.toFixed(4)} @ {money(trade.price)} · {t("portfolio.colTxGross")}{" "}
-                  {money(trade.gross)}
-                  {trade.realized_pnl ? (
-                    <>
-                      {" "}· {t("portfolio.colTxRealized")}{" "}
-                      <span className={trade.realized_pnl >= 0 ? "font-semibold text-ink-900" : "font-semibold text-risk"}>
-                        {trade.realized_pnl > 0 ? "+" : ""}
-                        {money(trade.realized_pnl)}
-                      </span>
-                    </>
-                  ) : null}
-                </p>
-                <p className="mt-2 border-t border-ink-900/15 pt-2 text-xs italic leading-5 text-ink-900/80">
-                  {lessonFor(trade, t)}
-                </p>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <section className="panel">
-            <EmptyState title={t("journal.empty")} detail={t("journal.emptyDetail")} />
-          </section>
-        )}
       </section>
     </div>
   );

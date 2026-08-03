@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 
 import { useApp } from "../../store/AppContext.jsx";
 import { eraForDate } from "../../utils/era.js";
-import { CYCLE_META, money, percent, toneClass } from "../../utils/format.js";
+import { CYCLE_META } from "../../utils/format.js";
 import Avatar from "../Avatar.jsx";
 import BlackSwanModal from "../story/BlackSwanModal.jsx";
 import ChronicleModal from "../story/ChronicleModal.jsx";
@@ -107,8 +107,6 @@ function TopBar() {
   const market = gameState?.market;
   const cycle = CYCLE_META[market?.market_cycle] || CYCLE_META.recovery;
   const era = eraForDate(market?.date, lang);
-  const sentimentPct = market ? Math.round(((market.sentiment - 0.55) / 0.95) * 100) : 0;
-  const benchmarkChange = market?.benchmark_change_pct || 0;
   const isHost = Boolean(authPlayer?.is_host);
 
   const confirmReset = () => {
@@ -133,35 +131,6 @@ function TopBar() {
         >
           {t(`cycle.${market?.market_cycle}`)}
         </span>
-        <div className="hidden items-center gap-2 md:flex">
-          <div className="w-24">
-            <div className="mb-1 flex justify-between text-[10px] text-parch-500">
-              <span>{t("topbar.sentiment")}</span>
-              <span className="tabular text-parch-300">{market?.sentiment?.toFixed(2)}</span>
-            </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-ink-600">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-risk via-gold to-mint"
-                style={{ width: `${sentimentPct}%` }}
-              />
-            </div>
-          </div>
-          <div className="hidden border-l border-ink-600 pl-3 lg:block">
-            <p className="text-[10px] uppercase tracking-wide text-parch-500">{t("topbar.benchmark")}</p>
-            <p className="text-sm font-semibold tabular text-parch-100">
-              {market ? money(market.benchmark_value, 2) : "…"}
-              <span className={`ml-1.5 text-xs ${toneClass(benchmarkChange)}`}>
-                {percent(benchmarkChange)}
-              </span>
-            </p>
-          </div>
-          <div className="hidden border-l border-ink-600 pl-3 xl:block">
-            <p className="text-[10px] uppercase tracking-wide text-parch-500">{t("topbar.rate")}</p>
-            <p className="text-sm font-semibold tabular text-parch-100">
-              {market?.policy_rate?.toFixed(2)}%
-            </p>
-          </div>
-        </div>
       </div>
       <div className="flex items-center gap-2">
         {isHost ? (

@@ -66,7 +66,7 @@ async function loginHost(page) {
 async function waitForDashboard(page) {
   await page.waitForSelector("text=Portfolio value", { timeout: 20000 });
   await page.waitForSelector("text=Market movers", { timeout: 15000 });
-  await page.waitForSelector("text=Era Chronicle", { timeout: 15000 });
+  await page.waitForSelector("text=Historical events", { timeout: 15000 });
   await page.waitForTimeout(800);
 }
 
@@ -126,7 +126,7 @@ async function canvasCheck(page, label) {
   }
   await page.getByRole("button", { name: "Got it" }).click();
 
-  await page.getByTitle("Investor Journal").click();
+  await page.getByTitle("Holdings").click();
   await page.waitForSelector("text=Holdings", { timeout: 15000 });
   await page.waitForTimeout(1000);
   await canvasCheck(page, "portfolio equity chart");
