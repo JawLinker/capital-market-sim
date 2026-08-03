@@ -57,6 +57,9 @@ Every price move is real history, replayed day by day.
 - **Newspaper earnings & policy wires**: giant-company earnings open as a
   Capital Daily front page, and policy/international shocks join the black swan
   pool from 2021 to 2026
+- **Dividends & market review**: companies pay annual cash dividends that
+  adjust prices on the ex-date, the newspaper gains a market-review page with
+  northbound flows, and the dashboard shows the daily northbound indicator
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

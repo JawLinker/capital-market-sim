@@ -22,6 +22,7 @@ from ..services.duels import settle_duels
 from ..services.pending_orders import execute_pending_orders
 from ..services.predictions import validate_judgments
 from ..services.newspaper import collect_newspaper
+from ..services.dividends import process_dividends
 
 router = APIRouter(prefix="/api", tags=["game"])
 
@@ -29,6 +30,10 @@ router = APIRouter(prefix="/api", tags=["game"])
 def _market_overview(db: Session, lang: str = "en"):
     state = db.query(models.GameState).first()
     stocks = db.query(models.Stock).all()
+    northbound_flow = round(
+        (state.sentiment - 0.5) * 400 + ((state.day * 7) % 100 - 50),
+        2,
+    )
     movers = sorted(
         stocks,
         key=lambda s: (s.price / s.prev_close - 1.0) if s.prev_close else 0.0,
@@ -54,6 +59,7 @@ def _market_overview(db: Session, lang: str = "en"):
         )
         if state.benchmark_prev
         else 0.0,
+        "northbound_flow": northbound_flow,
         "gainers": [
             {
                 "ticker": s.ticker,
@@ -105,6 +111,35 @@ def post_advance(
     duel_results = settle_duels(db)
     judgment_results = validate_judgments(db)
     newspaper = collect_newspaper(db, result["day"], get_lang(request))
+    dividend_results = process_dividends(db)
+    stocks = db.query(models.Stock).all()
+    movers = sorted(
+        stocks,
+        key=lambda s: (s.price / s.prev_close - 1.0) if s.prev_close else 0.0,
+        reverse=True,
+    )
+    game_state = db.query(models.GameState).first()
+    northbound_flow = round(
+        (game_state.sentiment - 0.5) * 400 + ((result["day"] * 7) % 100 - 50),
+        2,
+    )
+    market_summary = {
+        "gainers": [
+            {
+                "name": stock.name,
+                "change_pct": round((stock.price / stock.prev_close - 1.0) * 100, 2),
+            }
+            for stock in movers[:3]
+        ],
+        "losers": [
+            {
+                "name": stock.name,
+                "change_pct": round((stock.price / stock.prev_close - 1.0) * 100, 2),
+            }
+            for stock in reversed(movers[-3:])
+        ],
+        "northbound_flow": northbound_flow,
+    }
     black_swan = None
     if days == 1 and random.random() < 0.03:
         state = db.query(models.GameState).first()
@@ -159,6 +194,12 @@ def post_advance(
             if result["player_id"] == player.id
         ],
         "newspaper": newspaper,
+        "market_summary": market_summary,
+        "dividends": [
+            {k: v for k, v in item.items() if k != "player_id"}
+            for item in dividend_results
+            if item["player_id"] == player.id
+        ],
     }
 
 

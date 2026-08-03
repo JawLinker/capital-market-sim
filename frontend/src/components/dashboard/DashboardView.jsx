@@ -240,6 +240,12 @@ export default function DashboardView() {
                 [t("topbar.sentiment"), market?.sentiment?.toFixed(2) ?? "…"],
                 [t("home.inflation"), `${market?.inflation?.toFixed(2) ?? "…"}%`],
                 [t("topbar.benchmark"), market ? money(market.benchmark_value, 0) : "…"],
+                [
+                  t("home.northbound"),
+                  market
+                    ? `${market.northbound_flow >= 0 ? "+" : ""}${market.northbound_flow}`
+                    : "…",
+                ],
               ].map(([label, value]) => (
                 <div
                   key={label}

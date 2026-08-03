@@ -68,6 +68,7 @@ export function AppProvider({ children }) {
   const [eraTransition, setEraTransition] = useState(null);
   const [blackSwan, setBlackSwan] = useState(null);
   const [newspaper, setNewspaper] = useState(null);
+  const [marketSummary, setMarketSummary] = useState(null);
   const [muted, setMutedState] = useState(
     () => localStorage.getItem("cms-muted") === "1"
   );
@@ -370,6 +371,17 @@ export function AppProvider({ children }) {
       if (result.newspaper && result.newspaper.length > 0) {
         setNewspaper(result.newspaper[0]);
       }
+      if (result.market_summary) {
+        setMarketSummary(result.market_summary);
+      }
+      (result.dividends || []).forEach((dividend) => {
+        addToast(
+          "success",
+          t("dividend.title"),
+          `${dividend.name} · +${dividend.total}`
+        );
+        sounds.money();
+      });
       if (result.black_swan) {
         setBlackSwan(result.black_swan);
         sounds.blackSwan();
@@ -569,6 +581,7 @@ export function AppProvider({ children }) {
       closeBlackSwan,
       newspaper,
       closeNewspaper,
+      marketSummary,
       muted,
       toggleMute,
       autoPlay,
@@ -624,6 +637,7 @@ export function AppProvider({ children }) {
       closeBlackSwan,
       newspaper,
       closeNewspaper,
+      marketSummary,
       muted,
       toggleMute,
       autoPlay,
