@@ -73,7 +73,9 @@ export function AppProvider({ children }) {
     () => localStorage.getItem("cms-muted") === "1"
   );
   const [autoPlay, setAutoPlay] = useState(false);
-  const [autoSpeed, setAutoSpeed] = useState(2);
+  const [dayMinutes, setDayMinutes] = useState(2);
+  const [countdown, setCountdown] = useState(0);
+  const nextAdvanceAtRef = useRef(0);
   const toastId = useRef(0);
   const achievementsRef = useRef(null);
   const didInit = useRef(false);
@@ -451,7 +453,9 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     if (!autoPlay) return undefined;
-    const timer = window.setInterval(() => {
+    const dayMs = dayMinutes * 60000;
+    nextAdvanceAtRef.current = Date.now() + dayMs;
+    const tick = () => {
       if (
         busy ||
         storyOpen ||
@@ -462,12 +466,24 @@ export function AppProvider({ children }) {
       ) {
         return;
       }
-      advanceDay(1, { silent: true });
-    }, 3000 / autoSpeed);
-    return () => window.clearInterval(timer);
+      advanceDay(1, { silent: true }).finally(() => {
+        nextAdvanceAtRef.current = Date.now() + dayMs;
+      });
+    };
+    const main = window.setInterval(tick, dayMs);
+    const counter = window.setInterval(() => {
+      setCountdown(
+        Math.max(0, Math.round((nextAdvanceAtRef.current - Date.now()) / 1000))
+      );
+    }, 500);
+    return () => {
+      window.clearInterval(main);
+      window.clearInterval(counter);
+      setCountdown(0);
+    };
   }, [
     autoPlay,
-    autoSpeed,
+    dayMinutes,
     busy,
     storyOpen,
     chronicleOpen,
@@ -585,9 +601,10 @@ export function AppProvider({ children }) {
       muted,
       toggleMute,
       autoPlay,
-      autoSpeed,
+      dayMinutes,
+      setDayMinutes,
+      countdown,
       toggleAutoPlay,
-      setAutoSpeed,
       resolveBlackSwanOption,
       applyEraBonus,
       openStory,
@@ -641,9 +658,10 @@ export function AppProvider({ children }) {
       muted,
       toggleMute,
       autoPlay,
-      autoSpeed,
+      dayMinutes,
+      setDayMinutes,
+      countdown,
       toggleAutoPlay,
-      setAutoSpeed,
       resolveBlackSwanOption,
       applyEraBonus,
       openStory,

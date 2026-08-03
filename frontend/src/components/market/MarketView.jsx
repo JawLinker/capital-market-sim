@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Newspaper, Search } from "lucide-react";
 
 import { useApp } from "../../store/AppContext.jsx";
@@ -33,8 +33,10 @@ export default function MarketView() {
     transactions,
     gameState,
     t,
+    autoPlay,
   } = useApp();
   const [search, setSearch] = useState("");
+  const [intradayPrice, setIntradayPrice] = useState(0);
   const [industry, setIndustry] = useState("all");
   const [sortKey, setSortKey] = useState("ticker");
 
@@ -81,6 +83,23 @@ export default function MarketView() {
     markers.sort((a, b) => (a.time < b.time ? -1 : 1));
     return markers;
   }, [quote, history, transactions, gameState]);
+
+  useEffect(() => {
+    setIntradayPrice(quote?.price || 0);
+  }, [quote?.price]);
+
+  useEffect(() => {
+    if (!autoPlay) return undefined;
+    const timer = window.setInterval(() => {
+      setIntradayPrice((current) => {
+        const base = quote?.price || current;
+        const band = base * 0.02;
+        const next = current + (Math.random() - 0.5) * base * 0.004;
+        return Math.max(base - band, Math.min(base + band, next));
+      });
+    }, 1500);
+    return () => window.clearInterval(timer);
+  }, [autoPlay, quote?.price]);
 
   return (
     <div className="grid h-full grid-cols-1 gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_400px] lg:p-5">
@@ -201,7 +220,14 @@ export default function MarketView() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold tabular text-parch-100">{money(quote.price)}</p>
+                  <div className="flex items-center justify-end gap-2">
+                    <p className="text-xl font-bold tabular text-parch-100">{money(quote.price)}</p>
+                    {autoPlay ? (
+                      <span className="rounded-[3px] border border-brass/40 bg-brass/10 px-1.5 py-0.5 text-[10px] font-semibold tabular text-brass">
+                        {t("market.intraday")} {money(intradayPrice)}
+                      </span>
+                    ) : null}
+                  </div>
                   <p className={`text-xs font-semibold tabular ${toneClass(quote.change_pct)}`}>
                     {quote.change_pct > 0 ? "+" : ""}{quote.change_pct.toFixed(2)}% {t("market.today")}
                   </p>

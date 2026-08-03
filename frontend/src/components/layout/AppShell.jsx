@@ -99,9 +99,10 @@ function TopBar() {
     muted,
     toggleMute,
     autoPlay,
-    autoSpeed,
+    dayMinutes,
+    setDayMinutes,
+    countdown,
     toggleAutoPlay,
-    setAutoSpeed,
   } = useApp();
   const [fastDays, setFastDays] = useState(30);
   const market = gameState?.market;
@@ -158,20 +159,24 @@ function TopBar() {
                 <span className="hidden xl:inline">{t("topbar.fastForward")}</span>
               </button>
               <span className="mx-0.5 h-4 w-px bg-ink-600" />
-              {[1, 2, 4].map((speed) => (
-                <button
-                  key={speed}
-                  onClick={() => setAutoSpeed(speed)}
-                  className={`rounded px-1.5 py-0.5 text-[11px] font-semibold tabular transition-colors ${
-                    autoSpeed === speed
-                      ? "bg-brass/20 text-brass"
-                      : "text-parch-600 hover:text-parch-300"
-                  }`}
-                  title={t("topbar.autoSpeed")}
-                >
-                  {speed}x
-                </button>
-              ))}
+              <select
+                value={dayMinutes}
+                onChange={(event) => setDayMinutes(Number(event.target.value))}
+                className="bg-transparent px-1 py-0.5 text-xs font-semibold tabular text-parch-300 outline-none"
+                title={t("topbar.dayLength")}
+              >
+                {[0.5, 1, 2].map((minutes) => (
+                  <option key={minutes} value={minutes} className="bg-ink-800">
+                    {minutes}m
+                  </option>
+                ))}
+              </select>
+              {autoPlay ? (
+                <span className="rounded bg-brass/15 px-1.5 py-0.5 text-[11px] font-semibold tabular text-brass">
+                  {String(Math.floor(countdown / 60)).padStart(2, "0")}:
+                  {String(countdown % 60).padStart(2, "0")}
+                </span>
+              ) : null}
               <button
                 onClick={toggleAutoPlay}
                 className={`rounded px-2 py-1 transition-colors ${

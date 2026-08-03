@@ -52,8 +52,9 @@ Every price move is real history, replayed day by day.
   moments
 - **Judgment validation**: tag each buy with a thesis; the market later rules
   it right or wrong with a golden toast or a face-slap, building a seer streak
-- **Auto play**: a countdown-driven live market mode with 1x/2x/4x speed, so a
-  fast run takes about 10-15 minutes and events pause the action
+- **Auto play**: a countdown-driven live market mode where each trading day
+  lasts 0.5-2 minutes (default 2), one week takes about 10 minutes, intraday
+  prices tick live, and events pause the action
 - **Newspaper earnings & policy wires**: giant-company earnings open as a
   Capital Daily front page, and policy/international shocks join the black swan
   pool from 2021 to 2026
