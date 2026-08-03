@@ -44,6 +44,9 @@ Every price move is real history, replayed day by day.
   the market moves, and a duel table lets you bet your cash against NPC rivals
 - **Sound design**: synthesized buy, sell, advance, achievement, black swan,
   and duel sounds with a mute toggle, no audio assets required
+- **Game-feel controls**: Space advances the day, B/P/Q/R jump between pages,
+  M toggles sound, one-click 1-lot orders, and stat values tick when they
+  change
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

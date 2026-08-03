@@ -181,6 +181,13 @@ export default function OrderPanel({ stock, defaultAction = "buy" }) {
               {t("order.quarter")}
             </button>
             <button
+              onClick={() => setShares("100")}
+              className="btn btn-ghost shrink-0 px-2.5 text-xs"
+              title={t("order.lotTitle")}
+            >
+              {t("order.lot")}
+            </button>
+            <button
               onClick={() => setQuick(0.5)}
               className="btn btn-ghost shrink-0 px-2.5 text-xs"
             >

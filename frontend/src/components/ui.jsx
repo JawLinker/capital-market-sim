@@ -14,7 +14,10 @@ export function StatCard({ label, value, sub, tone = "default", icon }) {
         <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-parch-500">
           {label}
         </p>
-        <p className={`mt-1 truncate text-xl font-semibold tabular ${valueClass}`}>
+        <p
+          key={String(value)}
+          className={`tick-flash mt-1 truncate text-xl font-semibold tabular ${valueClass}`}
+        >
           {value}
         </p>
         {sub ? <p className="mt-0.5 truncate text-xs text-parch-500">{sub}</p> : null}

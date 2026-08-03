@@ -96,3 +96,18 @@ body {
 .row-hover {
   @apply cursor-pointer transition-colors hover:bg-parch-500/10;
 }
+
+@keyframes tick-flash {
+  0% {
+    transform: translateY(-3px);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.tick-flash {
+  animation: tick-flash 0.45s ease-out;
+}

@@ -17,7 +17,7 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useApp } from "../../store/AppContext.jsx";
 import { eraForDate } from "../../utils/era.js";
@@ -264,7 +264,62 @@ function TopBar() {
 }
 
 export default function AppShell({ children }) {
-  const { loading, t, storyOpen, chronicleOpen, eraTransition, blackSwan } = useApp();
+  const {
+    loading,
+    t,
+    storyOpen,
+    chronicleOpen,
+    eraTransition,
+    blackSwan,
+    authPlayer,
+    setView,
+    advanceDay,
+    toggleMute,
+    closeStory,
+    closeChronicle,
+    closeEraTransition,
+    closeBlackSwan,
+  } = useApp();
+  const isHost = Boolean(authPlayer?.is_host);
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      const target = event.target;
+      if (
+        target &&
+        ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+      ) {
+        return;
+      }
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (isHost) advanceDay();
+      } else if (event.key === "Escape") {
+        closeStory();
+        closeChronicle();
+        closeEraTransition();
+        closeBlackSwan();
+      } else {
+        const key = event.key.toLowerCase();
+        if (key === "m") toggleMute();
+        else if (key === "b") setView("market");
+        else if (key === "p") setView("portfolio");
+        else if (key === "q") setView("quests");
+        else if (key === "r") setView("replay");
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    isHost,
+    advanceDay,
+    toggleMute,
+    setView,
+    closeStory,
+    closeChronicle,
+    closeEraTransition,
+    closeBlackSwan,
+  ]);
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
