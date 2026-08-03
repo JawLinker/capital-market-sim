@@ -12,7 +12,21 @@ import {
 
 import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
+import Avatar from "../Avatar.jsx";
 import { Badge } from "../ui.jsx";
+
+const LEGEND_ICONS = {
+  lg01: "trending-up",
+  lg02: "moon",
+  lg03: "coins",
+  lg04: "gem",
+  lg05: "rocket",
+  lg06: "sparkles",
+  lg07: "landmark",
+  lg08: "shield",
+  lg09: "star",
+  lg10: "flame",
+};
 
 export default function StoriesArchiveView() {
   const { t } = useApp();
@@ -188,7 +202,12 @@ export default function StoriesArchiveView() {
                       {legend.source}
                     </p>
                   </div>
-                  <h3 className="font-display text-lg font-bold leading-7 text-parch-100">{legend.title}</h3>
+                  <div className="flex items-center gap-3">
+                    <Avatar seed={legend.title} iconKey={LEGEND_ICONS[legend.id]} size={34} />
+                    <h3 className="font-display text-lg font-bold leading-7 text-parch-100">
+                      {legend.title}
+                    </h3>
+                  </div>
                   <p className="text-sm leading-6 text-parch-300">{legend.story}</p>
                   <div className="rounded-[3px] border border-brass/35 bg-brass/10 px-3 py-2.5">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-brass">

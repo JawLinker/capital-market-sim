@@ -27,6 +27,8 @@ Every price move is real history, replayed day by day.
   era banner graded by your total return
 - **Legend NPC traders**: anonymized market archetypes such as the Ningbo
   commandos and the noodle man trade live against you in the leaderboard
+- **Procedural avatars**: every player and legend NPC gets a deterministic
+  icon-and-color avatar, generated locally with no image assets
 - **A-share rules**: 10%/20% daily price limits, T+1 settlement, commissions,
   minimum fees, and 0.05% sell-side stamp duty
 - **Order-book microstructure**: every stock has live bid/ask depth; large

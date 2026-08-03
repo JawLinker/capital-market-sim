@@ -15,6 +15,7 @@ import { useApp } from "../../store/AppContext.jsx";
 import { eraForDate, playableEras } from "../../utils/era.js";
 import { money, percent } from "../../utils/format.js";
 import LineChart from "../charts/LineChart.jsx";
+import Avatar from "../Avatar.jsx";
 import { ArchiveCard, EraBadge, MuseumHeader, TimelineNavigator } from "../museum.jsx";
 import { Badge, Change, EmptyState, SectionTitle, StatCard } from "../ui.jsx";
 
@@ -450,7 +451,7 @@ export default function DashboardView() {
                 <li key={trade.id} className="flex items-center justify-between gap-2 bg-ink-800 px-4 py-2.5">
                   <div className="min-w-0">
                     <p className="flex items-center gap-2 text-xs font-semibold text-parch-200">
-                      <ScrollText size={13} className="text-brass" />
+                      <Avatar seed={trade.player} size={18} />
                       <span className="truncate">{trade.player}</span>
                       <Badge
                         className={

@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useApp } from "../../store/AppContext.jsx";
 import { eraForDate } from "../../utils/era.js";
 import { CYCLE_META, money, percent, toneClass } from "../../utils/format.js";
+import Avatar from "../Avatar.jsx";
 import ChronicleModal from "../story/ChronicleModal.jsx";
 import EraTransitionModal from "../story/EraTransitionModal.jsx";
 import RetailStoryModal from "../story/RetailStoryModal.jsx";
@@ -201,6 +202,7 @@ function TopBar() {
         </button>
         {authPlayer ? (
           <div className="hidden items-center gap-2 rounded-[3px] border border-ink-600/70 bg-ink-800/70 px-2.5 py-1.5 sm:flex">
+            <Avatar seed={authPlayer.username || authPlayer.name} size={22} />
             <span className="max-w-28 truncate text-xs font-semibold text-parch-200">
               {authPlayer.username}
             </span>

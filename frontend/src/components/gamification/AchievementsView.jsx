@@ -4,6 +4,7 @@ import { Award, Target, Trophy, X } from "lucide-react";
 import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
 import { money, percent, toneClass } from "../../utils/format.js";
+import Avatar from "../Avatar.jsx";
 import LineChart from "../charts/LineChart.jsx";
 import { Badge, ProgressBar, SectionTitle } from "../ui.jsx";
 
@@ -195,6 +196,7 @@ export default function AchievementsView() {
                   </td>
                   <td className="td">
                     <span className="flex items-center gap-2 font-semibold text-parch-100">
+                      <Avatar seed={entry.name} size={22} />
                       {entry.name}
                       {entry.kind === "player" && entry.is_current ? (
                         <Badge className="border-sky/40 bg-sky/10 text-sky">{t("achievements.you")}</Badge>
