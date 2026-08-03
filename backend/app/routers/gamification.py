@@ -79,6 +79,8 @@ def get_leaderboard(request: Request, db: Session = Depends(get_db)):
                 entry["medal"] = "bronze"
             else:
                 entry["medal"] = None
+    if entries:
+        entries[-1]["noodle"] = True
     player_rank = next(
         e["rank"] for e in entries if e.get("is_current")
     )

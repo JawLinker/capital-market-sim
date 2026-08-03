@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Award, Target, Trophy, X } from "lucide-react";
+import { Award, Soup, Target, Trophy, X } from "lucide-react";
 
 import { api } from "../../api/client.js";
 import { useApp } from "../../store/AppContext.jsx";
@@ -219,6 +219,15 @@ export default function AchievementsView() {
                           {t(
                             `season.medal${entry.medal.charAt(0).toUpperCase()}${entry.medal.slice(1)}`
                           )}
+                        </Badge>
+                      ) : null}
+                      {entry.noodle ? (
+                        <Badge
+                          className="border-gold/40 bg-gold/10 text-gold"
+                          title={t("season.noodle")}
+                        >
+                          <Soup size={11} />
+                          {t("season.noodle")}
                         </Badge>
                       ) : entry.kind === "benchmark" ? (
                         <Badge className="border-ink-500/50 text-parch-500">{t("achievements.index")}</Badge>

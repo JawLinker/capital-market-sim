@@ -106,6 +106,26 @@ def check_all(db: Session, player: models.Player) -> list[str]:
     check("day_30", state.day >= 30)
     check("day_100", state.day >= 100)
 
+    rival_values = [rival.total_value for rival in db.query(models.Rival).all()]
+    player_values = []
+    for other in db.query(models.Player).all():
+        holdings = (
+            db.query(models.Holding)
+            .filter(models.Holding.player_id == other.id)
+            .all()
+        )
+        player_values.append(
+            other.cash
+            + sum(
+                holding.shares * db.get(models.Stock, holding.stock_id).price
+                for holding in holdings
+            )
+        )
+    all_values = player_values + rival_values
+    rank = 1 + sum(1 for candidate in all_values if candidate > value)
+    if len(all_values) > 1 and rank == len(all_values):
+        check("noodle_last", True)
+
     try:
         from .chronicle import build_chronicle
 

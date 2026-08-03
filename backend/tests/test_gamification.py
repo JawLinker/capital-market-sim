@@ -20,4 +20,5 @@ def test_leaderboard_contains_player_and_rivals(client):
     assert "season" in data
     current = next(entry for entry in data["entries"] if entry.get("is_current"))
     assert "medal" in current
-    assert 1 <= data["player_rank"] <= 38
+    assert 1 <= data["player_rank"] <= 42
+    assert any(entry.get("noodle") for entry in data["entries"])

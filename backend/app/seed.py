@@ -39,6 +39,7 @@ ACHIEVEMENTS = [
     ("chronicle_profit", "Profit Taker", "Complete a chapter objective tied to tech profit.", "trading"),
     ("chronicle_cash", "Cash Warden", "Complete a chapter objective tied to holding cash.", "strategy"),
     ("chronicle_survivor", "Cycle Survivor", "Complete a chapter objective tied to total return.", "risk"),
+    ("noodle_last", "Lights-Off Noodles", "Finish in last place. The noodles are on the house.", "risk"),
 ]
 
 RIVALS = [
