@@ -144,6 +144,8 @@ def post_reset(request: Request, db: Session = Depends(get_db)):
         models.BotTrade,
         models.BotHistory,
         models.BotHolding,
+        models.StorylineProgress,
+        models.RankStreak,
         models.Rival,
         models.Achievement,
         models.Player,

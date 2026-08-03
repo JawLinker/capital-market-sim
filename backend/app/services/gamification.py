@@ -126,6 +126,29 @@ def check_all(db: Session, player: models.Player) -> list[str]:
     if len(all_values) > 1 and rank == len(all_values):
         check("noodle_last", True)
 
+    streak = (
+        db.query(models.RankStreak)
+        .filter(models.RankStreak.player_id == player.id)
+        .first()
+    )
+    if streak is None:
+        streak = models.RankStreak(
+            player_id=player.id,
+            current_streak=0,
+            best_streak=0,
+            last_day=-1,
+        )
+        db.add(streak)
+    if state.day != streak.last_day:
+        if rank == 1:
+            streak.current_streak += 1
+            streak.best_streak = max(streak.best_streak, streak.current_streak)
+        else:
+            streak.current_streak = 0
+        streak.last_day = state.day
+    check("three_peat", streak.current_streak >= 3)
+    check("stock_god", streak.current_streak >= 5)
+
     try:
         from .chronicle import build_chronicle
 

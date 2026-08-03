@@ -93,6 +93,16 @@ class StorylineProgress(Base):
     completed_at = Column(String(32), default=utc_now)
 
 
+class RankStreak(Base):
+    __tablename__ = "rank_streaks"
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=False, index=True)
+    current_streak = Column(Integer, nullable=False, default=0)
+    best_streak = Column(Integer, nullable=False, default=0)
+    last_day = Column(Integer, nullable=False, default=-1)
+
+
 class Holding(Base):
     __tablename__ = "holdings"
     __table_args__ = (UniqueConstraint("player_id", "stock_id", name="uq_holding"),)

@@ -40,6 +40,8 @@ ACHIEVEMENTS = [
     ("chronicle_cash", "Cash Warden", "Complete a chapter objective tied to holding cash.", "strategy"),
     ("chronicle_survivor", "Cycle Survivor", "Complete a chapter objective tied to total return.", "risk"),
     ("noodle_last", "Lights-Off Noodles", "Finish in last place. The noodles are on the house.", "risk"),
+    ("three_peat", "Three-Peat", "Be rank 1 for three consecutive trading days.", "trading"),
+    ("stock_god", "Stock Master", "Be rank 1 for five consecutive trading days.", "trading"),
 ]
 
 RIVALS = [
